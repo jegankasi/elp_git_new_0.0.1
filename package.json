@@ -19,6 +19,7 @@
     "jsonwebtoken": "^8.5.1",
     "massive": "^6.6.0",
     "moment": "^2.29.1",
+    "node-cache": "^5.1.2",
     "pg": "^8.5.1",
     "underscore": "^1.10.2",
     "uuid": "^8.3.0"

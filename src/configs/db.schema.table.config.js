@@ -24,7 +24,8 @@ const doc_db_config = {
     tl_vehicle: "tl_vehicle",
     tl_water_plant: 'tl_water_plant',
     tl_util: "tl_util",
-    tl_group: "tl_group"
+    tl_group: "tl_group",
+    tl_cache: "tl_cache"
 }
 
 module.exports = {

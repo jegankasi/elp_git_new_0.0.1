@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
   try {
     let data;
     if (req.query.raw) {
-      data = await tl_field_info_service.getRaw(req.app.get("db"), req.params.id);
+      data = await tl_field_info_service.getRaw(req.app.get("db"), req.query.formId);
     } else {
       data = await tl_field_info_service.getAll(req.app.get("db"), req.params.id);
     }

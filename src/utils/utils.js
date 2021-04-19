@@ -3,6 +3,7 @@ var aes256 = require('aes256');
 const moment = require("moment");
 
 
+let cache = null;
 
 const action_flag_A = "A";
 const action_flag_M = "M";
@@ -67,8 +68,6 @@ const getUserId = (tokenId) => {
     }
 }
 
-
-
 module.exports = {
     check_required_fields,
     decrypt,
@@ -80,5 +79,5 @@ module.exports = {
     action_flag_A,
     action_flag_M,
     action_flag_D,
-    Group,
+    Group
 }

@@ -26,6 +26,7 @@ const tl_vehicle = require('../controllers/tl_vehicle.controller');
 const tl_water_plant = require('../controllers/tl_water_plant.controller');
 const tl_util = require('../controllers/tl_util.controller');
 const tl_group = require('../controllers/tl_group.controller');
+const tl_login = require('../controllers/tl_login.controller');
 
 router.use('/tl_util', tl_util);
 router.use('/tl_audit_log', tl_audit_log);
@@ -52,5 +53,6 @@ router.use('/tl_user', tl_user);
 router.use('/tl_vehicle', tl_vehicle);
 router.use('/tl_water_plant', tl_water_plant);
 router.use('/tl_group', tl_group);
+router.use('/tl_login', tl_login);
 
 module.exports = router;

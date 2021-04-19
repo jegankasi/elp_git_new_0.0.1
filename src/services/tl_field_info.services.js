@@ -19,9 +19,14 @@ const get = async (dbConnection, id, raw) => {
     }
 }
 
-const getRaw = async (dbConnection, criteria) => {
+const getRaw = async (dbConnection, formId) => {
+
+    let criteria = {};
+    if (formId) {
+        criteria.form_name = formId
+    }
     try {
-        let doc = await db_fn.get_all_from_db(dbConnection, schema, tl_field_info, {});
+        let doc = await db_fn.get_all_from_db(dbConnection, schema, tl_field_info, { ...criteria });
         return doc;
     } catch (err) {
         throw err;
@@ -37,6 +42,7 @@ const getAll = async (dbConnection, formName) => {
         let form = await tl_util.get(dbConnection, { "key": formName }, { "fields": ['id', 'value'] });
         if (form && form.id) {
             let doc = await db_fn.get_all_from_db(dbConnection, schema, tl_field_info, { form_name: form.id });
+
             for (const currentValue of doc) {
                 const sectionRecord = { section: "", section_position: "", section_column_grid: "", fields: [] };
                 const fieldRecord = {};

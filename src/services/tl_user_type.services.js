@@ -3,7 +3,7 @@ const { schema, tl_user_type } = require('../configs/db.schema.table.config').do
 const formValidation = require('../configs/before.validation').formValidation;
 const formRequiredField = require('../configs/table.model');
 const { getUserId, currentDate, action_flag_A, action_flag_M, Group } = require('../utils/utils');
-const tl_profile = require('./tl_profile.services');
+
 
 
 const get = async (dbConnection, criteria, fieldItem) => {

@@ -47,7 +47,7 @@ app.use(fileUpload({
   app.use("*", function (req, res) {
     res.status(404).send({ status: "error", data: "Not Found!" });
   });
-  const port = process.env.PORT || 3000;
+  const port = process.env.PORT || 5000;
   app.listen(port, () => {
     console.log("jab_service is running in port: " + port);
   });

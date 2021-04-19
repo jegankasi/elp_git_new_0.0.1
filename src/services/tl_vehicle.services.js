@@ -3,6 +3,7 @@ const { schema, tl_vehicle } = require('../configs/db.schema.table.config').doc_
 const formValidation = require('../configs/before.validation').formValidation;
 const formRequiredField = require('../configs/table.model');
 const { getUserId, currentDate, action_flag_A, action_flag_M } = require('../utils/utils');
+const { checkAndInsertProfile } = require('../utils/database_common_function');
 
 const get = async (dbConnection, id) => {
     const doc = await db_fn.get_one_from_db(dbConnection, schema, tl_vehicle, { id });
@@ -17,8 +18,14 @@ const getAll = async (dbConnection) => {
 
 const insert = async (dbConnection, body, tokenId) => {
     await formValidation(formRequiredField.tl_vehicle("insert"), body);
+    let profile = await checkAndInsertProfile(dbConnection, body.user_id, "VEH");
+
+    if (!profile) {
+        throw "error is occured on generating profile_id"
+    }
     let data = {
         ...body,
+        profile_id: profile.id,
         action_flag: action_flag_A,
         created_on: currentDate(),
         modified_on: currentDate(),
@@ -32,8 +39,14 @@ const insert = async (dbConnection, body, tokenId) => {
 const update = async (dbConnection, body, tokenId) => {
     try {
         await formValidation(formRequiredField.tl_vehicle("update"), body);
+        let profile = await checkAndInsertProfile(dbConnection, body.user_id, "VEH");
+
+        if (!profile) {
+            throw "error is occured on generating profile_id"
+        }
         let data = {
             ...body,
+            profile_id: profile.id,
             action_flag: action_flag_M,
             modified_on: currentDate(),
             modified_by: getUserId(tokenId).userId
