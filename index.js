@@ -39,7 +39,9 @@ app.use(fileUpload({
   const authorization = require("./src/middlewares/authorization.middleware");
   const table_router = require("./src/routes/table_router");
   const table_transaction_router = require("./src/routes/table_transaction_router");
+  app.use("/v1/token", authorization.get_token);
   app.use("/v1", authorization.authorize_token);
+
   app.use("/v1/agency", table_router);
   app.use("/v1/transaction", table_transaction_router);
 

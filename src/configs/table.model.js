@@ -46,7 +46,8 @@ let field = {
     timestamp: "timestamp",
     object: "object",
     boolean: "boolean",
-    json: "json"
+    json: "json",
+    noValidate: "noValidate"
     //enum: (id) => enumObject[id]
 };
 
@@ -74,9 +75,9 @@ const tl_field_info = (method) => [
     { 'is_readonly': [field.noRequired, field.boolean] },
     { 'display_order': [field.required, field.num] },
     { 'is_enabled': [field.noRequired, field.boolean] },
-    { 'created_by': [field.noRequired, field.varchar, 1, 50] },
-    { 'created_on': [field.noRequired, field.timestamp] },
-    { 'modified_by': [field.noRequired, field.varchar, 1, 50] },
+    { 'created_by': [field.noValidate, field.varchar, 1, 50] },
+    { 'created_on': [field.noValidate, field.timestamp] },
+    { 'modified_by': [field.noValidate, field.varchar, 1, 50] },
     { 'field_options': [field.noRequired, field.num] },
     { 'field_options_icon': [field.noRequired, field.num] },
     { 'field_icon': [field.noRequired, field.varchar] }
@@ -88,10 +89,10 @@ const tl_field_labels = [
     { "lang_cd": [field.required, field.varchar, 1, 2] },
     { "label_id": [field.required, field.varchar, 1, 30] },
     { "text_label": [field.required, field.varchar, 1, 250] },
-    { "created_by": [field.noRequired, field.varchar, , 1, 50] },
-    { "created_on": [field.noRequired, field.timestamp] },
-    { "modified_by": [field.noRequired, field.timestamp] },
-    { "modified_on": [field.noRequired, field.timestamp] }
+    { "created_by": [field.noValidate, field.varchar, , 1, 50] },
+    { "created_on": [field.noValidate, field.timestamp] },
+    { "modified_by": [field.noValidate, field.timestamp] },
+    { "modified_on": [field.noValidate, field.timestamp] }
 ]
 
 const tl_profile = (method) => [
@@ -99,11 +100,11 @@ const tl_profile = (method) => [
     { "parent_id": [field.required, field.num, 1, 50] },
     { "user_type_id": [field.required, field.num, 1, 50] },
     { "description": [field.required, field.varchar, 1, 50] },
-    { "action_flag": [field.noRequired, field.varchar, 1, 1] },
-    { "created_by": [field.noRequired, field.varchar, 1, 50] },
-    { "created_on": [field.noRequired, field.timestamp] },
-    { "modified_by": [field.noRequired, field.varchar, 1, 50] },
-    { "modified_on": [field.noRequired, field.timestamp] }
+    { "action_flag": [field.noValidate, field.varchar, 1, 1] },
+    { "created_by": [field.noValidate, field.varchar, 1, 50] },
+    { "created_on": [field.noValidate, field.timestamp] },
+    { "modified_by": [field.noValidate, field.varchar, 1, 50] },
+    { "modified_on": [field.noValidate, field.timestamp] }
 ];
 
 const tl_function = (method) => [
@@ -111,11 +112,11 @@ const tl_function = (method) => [
     { "function_name": [field.required, field.varchar, 1, 50] },
     { "label": [field.required, field.varchar, 1, 100] },
     { "function_description": [field.required, field.varchar, 1, 50] },
-    { "action_flag": [field.noRequired, field.varchar, 1, 1] },
-    { "created_by": [field.noRequired, field.varchar, 1, 50] },
-    { "created_on": [field.noRequired, field.timestamp] },
-    { "modified_by": [field.noRequired, field.varchar, 1, 50] },
-    { "modified_on": [field.noRequired, field.timestamp] }
+    { "action_flag": [field.noValidate, field.varchar, 1, 1] },
+    { "created_by": [field.noValidate, field.varchar, 1, 50] },
+    { "created_on": [field.noValidate, field.timestamp] },
+    { "modified_by": [field.noValidate, field.varchar, 1, 50] },
+    { "modified_on": [field.noValidate, field.timestamp] }
 ];
 
 const tl_profile_function = (method) => [
@@ -130,21 +131,21 @@ const tl_profile_function = (method) => [
     { "_updateAll": [field.required, field.num] },
     { "_delete": [field.required, field.num] },
     { "_deleteAll": [field.required, field.num] },
-    { "action_flag": [field.noRequired, field.varchar, 1, 1] },
-    { "created_by": [field.noRequired, field.varchar, 1, 50] },
-    { "created_on": [field.noRequired, field.timestamp] },
-    { "modified_by": [field.noRequired, field.varchar, 1, 50] },
-    { "modified_on": [field.noRequired, field.timestamp] }
+    { "action_flag": [field.noValidate, field.varchar, 1, 1] },
+    { "created_by": [field.noValidate, field.varchar, 1, 50] },
+    { "created_on": [field.noValidate, field.timestamp] },
+    { "modified_by": [field.noValidate, field.varchar, 1, 50] },
+    { "modified_on": [field.noValidate, field.timestamp] }
 ];
 
 const tl_user_type = (method) => [
     { "id": [method === 'update' ? field.required : field.noRequired, field.num] },
     { "user_type": [field.required, field.varchar, 1, 50] },
-    { "action_flag": [field.noRequired, field.varchar, 1, 1] },
-    { "created_by": [field.noRequired, field.varchar, 1, 50] },
-    { "created_on": [field.noRequired, field.timestamp] },
-    { "modified_by": [field.noRequired, field.varchar, 1, 50] },
-    { "modified_on": [field.noRequired, field.timestamp] }
+    { "action_flag": [field.noValidate, field.varchar, 1, 1] },
+    { "created_by": [field.noValidate, field.varchar, 1, 50] },
+    { "created_on": [field.noValidate, field.timestamp] },
+    { "modified_by": [field.noValidate, field.varchar, 1, 50] },
+    { "modified_on": [field.noValidate, field.timestamp] }
 ];
 
 const tl_subscription = (method) => [
@@ -173,11 +174,11 @@ const tl_subscription = (method) => [
     { "notify_expiry_by_email": [field.required, field.varchar, 1, 1] },
     { "notify_expiry_by_phone": [field.required, field.varchar, 1, 1] },
     { "receive_newsletters_on_mail": [field.required, field.varchar, 1, 1] },
-    { "action_flag": [field.noRequired, field.varchar, 1, 1] },
-    { "created_by": [field.noRequired, field.varchar, 1, 50] },
-    { "created_on": [field.noRequired, field.timestamp] },
-    { "modified_by": [field.noRequired, field.varchar, 1, 50] },
-    { "modified_on": [field.noRequired, field.timestamp] }
+    { "action_flag": [field.noValidate, field.varchar, 1, 1] },
+    { "created_by": [field.noValidate, field.varchar, 1, 50] },
+    { "created_on": [field.noValidate, field.timestamp] },
+    { "modified_by": [field.noValidate, field.varchar, 1, 50] },
+    { "modified_on": [field.noValidate, field.timestamp] }
 ];
 
 const tl_user = (method) => [
@@ -207,11 +208,11 @@ const tl_user = (method) => [
     { "deactivate_after_inactive_days": [field.noRequired, field.num] },
     { "session_id": [field.noRequired, field.varchar, 1, 250] },
     { "ip_address": [field.noRequired, field.varchar, 1, 50] },
-    { "action_flag": [field.noRequired, field.varchar, 1, 1] },
-    { "created_by": [field.noRequired, field.varchar, 1, 50] },
-    { "created_on": [field.noRequired, field.timestamp] },
-    { "modified_by": [field.noRequired, field.varchar, 1, 50] },
-    { "modified_on": [field.noRequired, field.timestamp] }
+    { "action_flag": [field.noValidate, field.varchar, 1, 1] },
+    { "created_by": [field.noValidate, field.varchar, 1, 50] },
+    { "created_on": [field.noValidate, field.timestamp] },
+    { "modified_by": [field.noValidate, field.varchar, 1, 50] },
+    { "modified_on": [field.noValidate, field.timestamp] }
 ];
 
 
@@ -225,11 +226,11 @@ const tl_team = (method) => [
     { "team_effective_from": [field.noRequired, field.timestamp] },
     { "team_effective_until": [field.noRequired, field.timestamp] },
     { "team_capacity_per_day": [field.required, field.num] },
-    { "action_flag": [field.noRequired, field.varchar, 1, 1] },
-    { "created_by": [field.noRequired, field.varchar, 1, 50] },
-    { "created_on": [field.noRequired, field.timestamp] },
-    { "modified_by": [field.noRequired, field.varchar, 1, 50] },
-    { "modified_on": [field.noRequired, field.timestamp] }
+    { "action_flag": [field.noValidate, field.varchar, 1, 1] },
+    { "created_by": [field.noValidate, field.varchar, 1, 50] },
+    { "created_on": [field.noValidate, field.timestamp] },
+    { "modified_by": [field.noValidate, field.varchar, 1, 50] },
+    { "modified_on": [field.noValidate, field.timestamp] }
 ];
 
 const tl_audit_log = (method) => [
@@ -250,11 +251,11 @@ const tl_retention = (method) => [
     { "group_id": [field.required, field.num, 1, 50] },
     { "table_id": [field.required, field.num, 1, 50] },
     { "retention_period": [field.required, field.num] },
-    { "action_flag": [field.noRequired, field.varchar, 1, 1] },
-    { "created_by": [field.noRequired, field.varchar, 1, 50] },
-    { "created_on": [field.noRequired, field.timestamp] },
-    { "modified_by": [field.noRequired, field.varchar, 1, 50] },
-    { "modified_on": [field.noRequired, field.timestamp] }
+    { "action_flag": [field.noValidate, field.varchar, 1, 1] },
+    { "created_by": [field.noValidate, field.varchar, 1, 50] },
+    { "created_on": [field.noValidate, field.timestamp] },
+    { "modified_by": [field.noValidate, field.varchar, 1, 50] },
+    { "modified_on": [field.noValidate, field.timestamp] }
 ];
 
 const tl_sequence = [
@@ -265,22 +266,22 @@ const tl_sequence = [
     { "sequence_ends_at": [field.required, field.varchar, 1, 50] },
     { "last_sequence_numer": [field.required, field.varchar, 1, 50] },
     { "string_to_append": [field.required, field.varchar, 1, 50] },
-    { "action_flag": [field.noRequired, field.varchar, 1, 1] },
-    { "created_by": [field.noRequired, field.varchar, 1, 50] },
-    { "created_on": [field.noRequired, field.timestamp] },
-    { "modified_by": [field.noRequired, field.varchar, 1, 50] },
-    { "modified_on": [field.noRequired, field.timestamp] }
+    { "action_flag": [field.noValidate, field.varchar, 1, 1] },
+    { "created_by": [field.noValidate, field.varchar, 1, 50] },
+    { "created_on": [field.noValidate, field.timestamp] },
+    { "modified_by": [field.noValidate, field.varchar, 1, 50] },
+    { "modified_on": [field.noValidate, field.timestamp] }
 ];
 
 const tl_tables = [
     { "group_id": [field.required, field.varchar, 1, 50] },
     { "table_id": [field.required, field.varchar, 1, 50] },
     { "table_name": [field.required, field.varchar, 1, 50] },
-    { "action_flag": [field.noRequired, field.varchar, 1, 1] },
-    { "created_by": [field.noRequired, field.varchar, 1, 50] },
-    { "created_on": [field.noRequired, field.timestamp] },
-    { "modified_by": [field.noRequired, field.varchar, 1, 50] },
-    { "modified_on": [field.noRequired, field.timestamp] }
+    { "action_flag": [field.noValidate, field.varchar, 1, 1] },
+    { "created_by": [field.noValidate, field.varchar, 1, 50] },
+    { "created_on": [field.noValidate, field.timestamp] },
+    { "modified_by": [field.noValidate, field.varchar, 1, 50] },
+    { "modified_on": [field.noValidate, field.timestamp] }
 ];
 
 const tl_water_plant = (method) => [
@@ -312,11 +313,11 @@ const tl_water_plant = (method) => [
     { "receivable_payment_mode": [field.required, field.varchar, 1, 10] },
     { "receivable_pymt_frequency": [field.required, field.varchar, 1, 10] },
     { "service_available_to_pin": [field.required, field.varchar, 1, 6] },
-    { "action_flag": [field.noRequired, field.varchar, 1, 1] },
-    { "created_by": [field.noRequired, field.varchar, 1, 50] },
-    { "created_on": [field.noRequired, field.timestamp] },
-    { "modified_by": [field.noRequired, field.varchar, 1, 50] },
-    { "modified_on": [field.noRequired, field.timestamp] },
+    { "action_flag": [field.noValidate, field.varchar, 1, 1] },
+    { "created_by": [field.noValidate, field.varchar, 1, 50] },
+    { "created_on": [field.noValidate, field.timestamp] },
+    { "modified_by": [field.noValidate, field.varchar, 1, 50] },
+    { "modified_on": [field.noValidate, field.timestamp] },
     { "plant_capacity": [field.required, field.num] }
 ];
 
@@ -345,11 +346,11 @@ const tl_industry = (method) => [
     { "ind_photo_attachment": [field.noRequired, field.varchar, 1, 50] },
     { "payment_payable_mode": [field.required, field.varchar, 1, 10] },
     { "payable_pymt_frequency": [field.required, field.varchar, 1, 10] },
-    { "action_flag": [field.noRequired, field.varchar, 1, 1] },
-    { "created_by": [field.noRequired, field.varchar, 1, 50] },
-    { "created_on": [field.noRequired, field.timestamp] },
-    { "modified_by": [field.noRequired, field.varchar, 1, 50] },
-    { "modified_on": [field.noRequired, field.timestamp] },
+    { "action_flag": [field.noValidate, field.varchar, 1, 1] },
+    { "created_by": [field.noValidate, field.varchar, 1, 50] },
+    { "created_on": [field.noValidate, field.timestamp] },
+    { "modified_by": [field.noValidate, field.varchar, 1, 50] },
+    { "modified_on": [field.noValidate, field.timestamp] },
 ];
 
 const tl_contractor = (method) => [
@@ -371,11 +372,11 @@ const tl_contractor = (method) => [
     { "attached_photo": [field.required, field.varchar, 1, 50] },
     { "attached_agency_photo": [field.required, field.varchar, 1, 50] },
     { "service_available_to_pin": [field.required, field.varchar, 1, 6] },
-    { "action_flag": [field.noRequired, field.varchar, 1, 1] },
-    { "created_by": [field.noRequired, field.varchar, 1, 50] },
-    { "created_on": [field.noRequired, field.timestamp] },
-    { "modified_by": [field.noRequired, field.varchar, 1, 50] },
-    { "modified_on": [field.noRequired, field.timestamp] },
+    { "action_flag": [field.noValidate, field.varchar, 1, 1] },
+    { "created_by": [field.noValidate, field.varchar, 1, 50] },
+    { "created_on": [field.noValidate, field.timestamp] },
+    { "modified_by": [field.noValidate, field.varchar, 1, 50] },
+    { "modified_on": [field.noValidate, field.timestamp] },
 ];
 
 const tl_sub_contractor = (method) => [
@@ -399,11 +400,11 @@ const tl_sub_contractor = (method) => [
     { "attached_photo": [field.required, field.varchar, 1, 50] },
     { "attached_agency_photo": [field.required, field.varchar, 1, 50] },
     { "service_available_to_pin": [field.required, field.varchar, 1, 6] },
-    { "action_flag": [field.noRequired, field.varchar, 1, 1] },
-    { "created_by": [field.noRequired, field.varchar, 1, 50] },
-    { "created_on": [field.noRequired, field.timestamp] },
-    { "modified_by": [field.noRequired, field.varchar, 1, 50] },
-    { "modified_on": [field.noRequired, field.timestamp] },
+    { "action_flag": [field.noValidate, field.varchar, 1, 1] },
+    { "created_by": [field.noValidate, field.varchar, 1, 50] },
+    { "created_on": [field.noValidate, field.timestamp] },
+    { "modified_by": [field.noValidate, field.varchar, 1, 50] },
+    { "modified_on": [field.noValidate, field.timestamp] },
 ];
 
 const tl_transport_agent = (method) => [
@@ -427,11 +428,11 @@ const tl_transport_agent = (method) => [
     { "attached_photo": [field.required, field.varchar, 1, 50] },
     { "attached_agency_photo": [field.required, field.varchar, 1, 50] },
     { "service_available_to_pin": [field.required, field.varchar, 1, 6] },
-    { "action_flag": [field.noRequired, field.varchar, 1, 1] },
-    { "created_by": [field.noRequired, field.varchar, 1, 50] },
-    { "created_on": [field.noRequired, field.timestamp] },
-    { "modified_by": [field.noRequired, field.varchar, 1, 50] },
-    { "modified_on": [field.noRequired, field.timestamp] },
+    { "action_flag": [field.noValidate, field.varchar, 1, 1] },
+    { "created_by": [field.noValidate, field.varchar, 1, 50] },
+    { "created_on": [field.noValidate, field.timestamp] },
+    { "modified_by": [field.noValidate, field.varchar, 1, 50] },
+    { "modified_on": [field.noValidate, field.timestamp] },
 ];
 
 const tl_driver = (method) => [
@@ -461,11 +462,11 @@ const tl_driver = (method) => [
     { "dl_attachment": [field.required, field.varchar, 1, 50] },
     { "photo_attachment": [field.required, field.varchar, 1, 50] },
     { "service_available_to_pin": [field.required, field.varchar, 1, 6] },
-    { "action_flag": [field.noRequired, field.varchar, 1, 1] },
-    { "created_by": [field.noRequired, field.varchar, 1, 50] },
-    { "created_on": [field.noRequired, field.timestamp] },
-    { "modified_by": [field.noRequired, field.varchar, 1, 50] },
-    { "modified_on": [field.noRequired, field.timestamp] },
+    { "action_flag": [field.noValidate, field.varchar, 1, 1] },
+    { "created_by": [field.noValidate, field.varchar, 1, 50] },
+    { "created_on": [field.noValidate, field.timestamp] },
+    { "modified_by": [field.noValidate, field.varchar, 1, 50] },
+    { "modified_on": [field.noValidate, field.timestamp] },
 ];
 
 const tl_delivery_boy = (method) => [
@@ -491,11 +492,11 @@ const tl_delivery_boy = (method) => [
     { "receivable_pymt_frequency": [field.required, field.varchar, 1, 10] },
     { "photo_attachment": [field.required, field.varchar, 1, 50] },
     { "service_available_to_pin": [field.required, field.varchar, 1, 6] },
-    { "action_flag": [field.noRequired, field.varchar, 1, 1] },
-    { "created_by": [field.noRequired, field.varchar, 1, 50] },
-    { "created_on": [field.noRequired, field.timestamp] },
-    { "modified_by": [field.noRequired, field.varchar, 1, 50] },
-    { "modified_on": [field.noRequired, field.timestamp] },
+    { "action_flag": [field.noValidate, field.varchar, 1, 1] },
+    { "created_by": [field.noValidate, field.varchar, 1, 50] },
+    { "created_on": [field.noValidate, field.timestamp] },
+    { "modified_by": [field.noValidate, field.varchar, 1, 50] },
+    { "modified_on": [field.noValidate, field.timestamp] },
 ];
 
 const tl_vehicle = (method) => [
@@ -531,11 +532,11 @@ const tl_vehicle = (method) => [
     { "receivable_payment_mode": [field.required, field.varchar, 1, 50] },
     { "receivable_pymt_frequency": [field.required, field.varchar, 1, 10] },
     { "service_available_to_pin": [field.required, field.varchar, 1, 6] },
-    { "action_flag": [field.noRequired, field.varchar, 1, 1] },
-    { "created_by": [field.noRequired, field.varchar, 1, 50] },
-    { "created_on": [field.noRequired, field.timestamp] },
-    { "modified_by": [field.noRequired, field.varchar, 1, 50] },
-    { "modified_on": [field.noRequired, field.timestamp] },
+    { "action_flag": [field.noValidate, field.varchar, 1, 1] },
+    { "created_by": [field.noValidate, field.varchar, 1, 50] },
+    { "created_on": [field.noValidate, field.timestamp] },
+    { "modified_by": [field.noValidate, field.varchar, 1, 50] },
+    { "modified_on": [field.noValidate, field.timestamp] },
 ];
 
 const tl_shop_keeper = (method) => [
@@ -561,11 +562,11 @@ const tl_shop_keeper = (method) => [
     { "receivable_payment_mode": [field.required, field.varchar, 1, 50] },
     { "receivable_pymt_frequency": [field.required, field.varchar, 1, 10] },
     { "service_available_to_pin": [field.required, field.varchar, 1, 6] },
-    { "action_flag": [field.noRequired, field.varchar, 1, 1] },
-    { "created_by": [field.noRequired, field.varchar, 1, 50] },
-    { "created_on": [field.noRequired, field.timestamp] },
-    { "modified_by": [field.noRequired, field.varchar, 1, 50] },
-    { "modified_on": [field.noRequired, field.timestamp] },
+    { "action_flag": [field.noValidate, field.varchar, 1, 1] },
+    { "created_by": [field.noValidate, field.varchar, 1, 50] },
+    { "created_on": [field.noValidate, field.timestamp] },
+    { "modified_by": [field.noValidate, field.varchar, 1, 50] },
+    { "modified_on": [field.noValidate, field.timestamp] },
 ];
 
 const tl_customers = (method) => [
@@ -582,11 +583,11 @@ const tl_customers = (method) => [
     { "volume_expected": [field.required, field.num] },
     { "delivery_slot1": [field.required, field.varchar, 1, 1] },
     { "delivery_slot2": [field.required, field.varchar, 1, 1] },
-    { "action_flag": [field.noRequired, field.varchar, 1, 1] },
-    { "created_by": [field.noRequired, field.varchar, 1, 50] },
-    { "created_on": [field.noRequired, field.timestamp] },
-    { "modified_by": [field.noRequired, field.varchar, 1, 50] },
-    { "modified_on": [field.noRequired, field.timestamp] },
+    { "action_flag": [field.noValidate, field.varchar, 1, 1] },
+    { "created_by": [field.noValidate, field.varchar, 1, 50] },
+    { "created_on": [field.noValidate, field.timestamp] },
+    { "modified_by": [field.noValidate, field.varchar, 1, 50] },
+    { "modified_on": [field.noValidate, field.timestamp] },
 ];
 
 const tl_util = (method) => [
@@ -594,11 +595,11 @@ const tl_util = (method) => [
     { "parent_id": [field.required, field.num] },
     { "key": [field.required, field.varchar, 1, 50] },
     { "options": [field.noRequired, field.varchar, 1, 255] },
-    { "action_flag": [field.noRequired, field.varchar, 1, 1] },
-    { "created_by": [field.noRequired, field.varchar, 1, 50] },
-    { "created_on": [field.noRequired, field.timestamp] },
-    { "modified_by": [field.noRequired, field.varchar, 1, 50] },
-    { "modified_on": [field.noRequired, field.timestamp] },
+    { "action_flag": [field.noValidate, field.varchar, 1, 1] },
+    { "created_by": [field.noValidate, field.varchar, 1, 50] },
+    { "created_on": [field.noValidate, field.timestamp] },
+    { "modified_by": [field.noValidate, field.varchar, 1, 50] },
+    { "modified_on": [field.noValidate, field.timestamp] },
     { "value": [field.required, field.varchar, 1, 50] }
 ];
 
@@ -606,11 +607,11 @@ const tl_group = (method) => [
     { "id": [method === 'update' ? field.required : field.noRequired, field.num] },
     { "group_name": [field.required, field.varchar, 1, 20] },
     { "description": [field.required, field.varchar, 1, 100] },
-    { "action_flag": [field.noRequired, field.varchar, 1, 1] },
-    { "created_by": [field.noRequired, field.varchar, 1, 50] },
-    { "created_on": [field.noRequired, field.timestamp] },
-    { "modified_by": [field.noRequired, field.varchar, 1, 50] },
-    { "modified_on": [field.noRequired, field.timestamp] }
+    { "action_flag": [field.noValidate, field.varchar, 1, 1] },
+    { "created_by": [field.noValidate, field.varchar, 1, 50] },
+    { "created_on": [field.noValidate, field.timestamp] },
+    { "modified_by": [field.noValidate, field.varchar, 1, 50] },
+    { "modified_on": [field.noValidate, field.timestamp] }
 ];
 
 

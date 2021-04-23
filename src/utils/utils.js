@@ -62,6 +62,8 @@ const get_all_keys_of_json = (object, return_object) => {
     return return_object;
 }
 
+const allowedUrls = ["v1/agency/tl_login"];
+
 const getUserId = (tokenId) => {
     return {
         userId: "12345"
@@ -79,5 +81,6 @@ module.exports = {
     action_flag_A,
     action_flag_M,
     action_flag_D,
-    Group
+    Group,
+    allowedUrls
 }

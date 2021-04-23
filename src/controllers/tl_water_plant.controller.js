@@ -3,7 +3,7 @@ const tl_water_plant = require("../services/tl_water_plant.services");
 const express = require('express');
 const router = express.Router();
 
-router.get('/:id', async (req, res) => {
+router.get('/id/:id', async (req, res) => {
     try {
         const data = await tl_water_plant.get(req, req.params.id);
         reposne_utils.send_response(req, res, 200, data)

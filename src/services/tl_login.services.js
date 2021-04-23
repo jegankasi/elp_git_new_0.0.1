@@ -53,7 +53,7 @@ const userProfile = async (dbConnection, user_id, roles) => {
 }
 
 
-const authCheck = async (dbConnection, body, tokenId) => {
+const authCheck = async (dbConnection, body) => {
     try {
         await formValidation(formRequiredField.tl_login("insert"), body);
         let criteria = {
@@ -73,13 +73,14 @@ const authCheck = async (dbConnection, body, tokenId) => {
             user.activeRole = "";
             user.profiles = await userProfile(dbConnection, tlUser.id, user.roles);
         }
-        let payLoad = {
-            user_id: tlUser.id,
-            document: user
-        }
-        await tl_cache_service.insert(dbConnection, payLoad);
-        return "checked";
+        // let payLoad = {
+        //     user_id: tlUser.id,
+        //     document: user
+        // }
+        // await tl_cache_service.insert(dbConnection, payLoad);
+        return user;
     } catch (err) {
+        console.log("err--->", err);
         throw err;
     }
 }
