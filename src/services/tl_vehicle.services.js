@@ -31,7 +31,8 @@ const insert = async (dbConnection, body, tokenId) => {
         modified_on: currentDate(),
         modified_by: getUserId(tokenId).userId,
         created_by: getUserId(tokenId).userId,
-        next_service_due: toJSDate(body.next_service_due)
+        next_service_due: toJSDate(body.next_service_due),
+        insurance_expires_on: toJSDate(body.insurance_expires_on)
 
     }
     return await db_fn.insert_records(dbConnection, schema, tl_vehicle, data);
@@ -51,7 +52,8 @@ const update = async (dbConnection, body, tokenId) => {
             action_flag: action_flag_M,
             modified_on: currentDate(),
             modified_by: getUserId(tokenId).userId,
-            next_service_due: toJSDate(body.next_service_due)
+            next_service_due: toJSDate(body.next_service_due),
+            insurance_expires_on: toJSDate(body.insurance_expires_on)
         }
 
 

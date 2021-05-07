@@ -471,7 +471,6 @@ const tl_driver = (method) => [
 
 const tl_delivery_boy = (method) => [
     { "id": [method === 'update' ? field.required : field.noRequired, field.num] },
-    { "group_id": [field.required, field.num, 1, 50] },
     { "user_id": [field.required, field.num, 1, 50] },
     { "transport_agent_id": [field.required, field.num, 1, 50] },
     { "deliveryboy_name": [field.required, field.varchar, 1, 50] },
@@ -501,15 +500,15 @@ const tl_delivery_boy = (method) => [
 
 const tl_vehicle = (method) => [
     { "id": [method === 'update' ? field.required : field.noRequired, field.num] },
-    { "group_id": [field.noRequired, field.num, 1, 50] },
+    // { "group_id": [field.noRequired, field.num, 1, 50] },
     // { "user_id": [field.required, field.num, 1, 50] },
     { "transport_agent_id": [field.required, field.num, 1, 50] },
-    { "driver_id": [field.required, field.num, 1, 50] },
+    // { "driver_id": [field.required, field.num, 1, 50] },
     // { "vehicle_id": [field.required, field.num, 1, 50] },
     { "vehicle_reg_no": [field.required, field.varchar, 1, 50] },
     { "owner_name": [field.required, field.varchar, 1, 50] },
     { "owner_address": [field.required, field.varchar, 1, 250] },
-    { "owner_phone": [field.required, field.num] },
+    { "owner_phone": [field.required, field.varchar, 1, 10] },
     { "owner_email": [field.required, field.varchar, 1, 50] },
     { "owner_pin": [field.required, field.varchar, 1, 6] },
     { "country_code": [field.required, field.varchar, 1, 3] },

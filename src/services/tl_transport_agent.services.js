@@ -31,7 +31,7 @@ const insert = async (dbConnection, body, tokenId) => {
             modified_on: currentDate(),
             modified_by: getUserId(tokenId).userId,
             created_by: getUserId(tokenId).userId,
-            established_on: currentDate()
+            dl_expires_on: toJSDate(body.dl_expires_on)
         }
         return await db_fn.insert_records(dbConnection, schema, tl_transport_agent, data);
     } catch (error) {
@@ -53,7 +53,8 @@ const update = async (dbConnection, body, tokenId) => {
             profile_id: profile.id,
             action_flag: action_flag_M,
             modified_on: currentDate(),
-            modified_by: getUserId(tokenId).userId
+            modified_by: getUserId(tokenId).userId,
+            dl_expires_on: toJSDate(body.dl_expires_on)
         }
 
 
