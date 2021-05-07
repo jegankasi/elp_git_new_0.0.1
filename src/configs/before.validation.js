@@ -15,8 +15,6 @@ const validate = (formField, requiredField, field) => {
             error[field] = `${field} should be ${requiredField[1]}`;
         } else if (typeof requiredField[1] === 'function') {
             let enumItm = requiredField[1](formField).find(element => element == formField);
-
-            // error[field] = `${field} should be ${requiredField[1]}`;
         } else if (typeof requiredField[2] !== 'undefined' && typeof requiredField[3] !== 'undefined') {
             if (formField.length < requiredField[2] || formField.length > requiredField[3]) {
                 error[field] = `minimum string length ${requiredField[2]} and maximum ${requiredField[3]}`;

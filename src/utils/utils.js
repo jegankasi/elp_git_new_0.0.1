@@ -15,6 +15,21 @@ const currentDate = () => {
     return new Date();
 }
 
+const toJSDate = (dateTime) => {
+    try {
+        moment.defaultFormat = "DD/MM/YYYY";
+        if (!moment(dateTime, moment.defaultFormat, true).isValid()) {
+            throw "date format is not correct"
+        }
+        return moment(dateTime, moment.defaultFormat, true).toDate();
+    } catch (err) {
+        throw err + " format is DD/MM/YYYY";
+    }
+}
+
+
+
+
 
 const check_required_fields = (actual_array, reference_array) => {
     const common_keys = _.intersection(actual_array, reference_array);
@@ -82,5 +97,6 @@ module.exports = {
     action_flag_M,
     action_flag_D,
     Group,
-    allowedUrls
+    allowedUrls,
+    toJSDate
 }

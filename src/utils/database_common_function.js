@@ -18,8 +18,7 @@ const checkAndInsertProfile = async (dbConnection, userId, user_type) => {
                 if (!profile) {
                     let body = {
                         parent_id: profileWP.id,
-                        user_id: userData.id,
-                        user_type_id: userType.id,
+                        user_type_id: userData.id,
                         type: "U",
                         description: `${user_type} ${userData.user_number}`
                     }

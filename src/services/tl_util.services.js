@@ -53,7 +53,6 @@ const update = async (dbConnection, body, tokenId) => {
         let criteria = {
             id
         }
-
         return await db_fn.update_records(dbConnection, schema, tl_util, criteria, data);
     } catch (error) {
         throw error;

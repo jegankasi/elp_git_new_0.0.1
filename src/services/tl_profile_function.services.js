@@ -9,8 +9,8 @@ const get = async (dbConnection, id) => {
     return doc;
 }
 
-const getAll = async (dbConnection) => {
-    const doc = await db_fn.get_all_from_db(dbConnection, schema, tl_profile_function, {}, {
+const getAll = async (dbConnection, critera) => {
+    const doc = await db_fn.get_all_from_db(dbConnection, schema, tl_profile_function, critera, {
         order: [
             { field: "id", direction: "asc" }
         ]

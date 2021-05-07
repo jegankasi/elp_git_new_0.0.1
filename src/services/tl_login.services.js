@@ -4,40 +4,48 @@ const { schema, tl_profile, tl_user, tl_user_type, tl_profile_function, tl_funct
 const { getUserId, currentDate, action_flag_A, action_flag_M } = require('../utils/utils');
 const formRequiredField = require('../configs/table.model');
 const formValidation = require('../configs/before.validation').formValidation;
-const tl_cache_service = require('./tl_cache.services');
+const tl_profile_service = require('./tl_profile.services');
+const tl_user_type_service = require('./tl_user_type.services');
+const tl_profile_function_service = require('./tl_profile_function.services');
+const tl_function_service = require('./tl_function.services');
+const tl_user_service = require('./tl_user.services');
 
 
 const profile_short = ["ADMIN", "CTR", "SCTR", "IND", "WP", "TPA", "VEH", "DR", "DB"];
 
+
+const getFunction = async (dbConnection, function_id, auth_url) => {
+    const fn = await tl_function_service.get(dbConnection, function_id, { fields: ['function_name', 'options'] });
+
+    const options = auth_url.map(data => fn.options[data]);
+    return { function_name: fn.function_name, options };
+}
+
 const getProfileAuthAccess = async (dbConnection, profile_id) => {
-    let user_profile_function = await db_fn.get_all_from_db(dbConnection, schema, tl_profile_function, { profile_id });
-    const item = {};
-    for (const prfFn of user_profile_function) {
-        let property = {};
-        let fn = await db_fn.get_one_from_db(dbConnection, schema, tl_function, { id: prfFn.function_id }, { fields: ['function_name'] });
-        property._create = prfFn._create;
-        property._createAll = prfFn._createAll;
-        property._read = prfFn._read;
-        property._readAll = prfFn._readAll;
-        property._update = prfFn._update;
-        property._updateAll = prfFn._updateAll;
-        property._delete = prfFn._delete;
-        property._deleteAll = prfFn._deleteAll;
-        item[fn.function_name] = property;
+    try {
+        let user_profile_function = await tl_profile_function_service.getAll(dbConnection, { profile_id });
+        const item = {};
+        console.log("user_profile_function--->", user_profile_function);
+        for (const prfFn of user_profile_function) {
+            const authUrl = await getFunction(dbConnection, prfFn.function_id, prfFn.auth_url);
+            item[authUrl.function_name] = authUrl.options;
+        }
+        return item;
+    } catch (err) {
+        throw err;
     }
-    return item;
 }
 
 
 
 const userProfile = async (dbConnection, user_id, roles) => {
-    let user_profiles = await db_fn.get_all_from_db(dbConnection, schema, tl_profile, { user_type_id: user_id, type: "U" });
+    let user_profiles = await tl_profile_service.getAll(dbConnection, { user_type_id: user_id, type: "U" });
     let profiles = {};
     for (const rec of user_profiles) {
         let userProfile = {};
-        let profile_rec = await db_fn.get_one_from_db(dbConnection, schema, tl_profile, { id: rec.parent_id });
+        let profile_rec = await tl_profile_service.get(dbConnection, { id: rec.parent_id });
         if (profile_rec) {
-            let userType = await db_fn.get_one_from_db(dbConnection, schema, tl_user_type, { id: profile_rec.user_type_id });
+            let userType = await tl_user_type_service.get(dbConnection, { id: profile_rec.user_type_id });
             if (userType) {
                 userProfile.user_type_id = userType.id;
                 userProfile.user_type = userType.user_type;
@@ -48,7 +56,6 @@ const userProfile = async (dbConnection, user_id, roles) => {
             }
         }
     }
-
     return profiles;
 }
 
@@ -61,7 +68,7 @@ const authCheck = async (dbConnection, body) => {
         }
 
         const user = {};
-        const tlUser = await db_fn.get_one_from_db(dbConnection, schema, tl_user, criteria);
+        const tlUser = await tl_user_service.get(dbConnection, criteria);
         if (tlUser) {
             user.user_id = tlUser.id;
             user.first_name = tlUser.first_name;
@@ -73,14 +80,8 @@ const authCheck = async (dbConnection, body) => {
             user.activeRole = "";
             user.profiles = await userProfile(dbConnection, tlUser.id, user.roles);
         }
-        // let payLoad = {
-        //     user_id: tlUser.id,
-        //     document: user
-        // }
-        // await tl_cache_service.insert(dbConnection, payLoad);
         return user;
     } catch (err) {
-        console.log("err--->", err);
         throw err;
     }
 }

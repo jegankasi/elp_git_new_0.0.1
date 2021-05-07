@@ -5,7 +5,7 @@ const express = require('express');
 const router = express.Router();
 
 
-router.get('/:id', async (req, res) => {
+router.get('/id/:id', async (req, res) => {
     try {
         const data = await tl_login_service.get(req, req.params.id);
         reposne_utils.send_response(req, res, 200, data)

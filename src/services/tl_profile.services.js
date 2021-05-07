@@ -24,8 +24,13 @@ const get = async (dbConnection, criteria, fieldItem) => {
         //     group_name: `${Group} || id`
         // }
     }
-    const doc = await db_fn.get_one_from_db(dbConnection, schema, tl_profile, criteria, fieldSet);
-    return doc;
+    try {
+        const doc = await db_fn.get_one_from_db(dbConnection, schema, tl_profile, criteria, fieldSet);
+        return doc;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
 }
 
 

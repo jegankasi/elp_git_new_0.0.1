@@ -110,8 +110,8 @@ const tl_profile = (method) => [
 const tl_function = (method) => [
     { "id": [method === 'update' ? field.required : field.noRequired, field.num] },
     { "function_name": [field.required, field.varchar, 1, 50] },
-    { "label": [field.required, field.varchar, 1, 100] },
-    { "function_description": [field.required, field.varchar, 1, 50] },
+    // { "label": [field.required, field.varchar, 1, 100] },
+    // { "function_description": [field.required, field.varchar, 1, 50] },
     { "action_flag": [field.noValidate, field.varchar, 1, 1] },
     { "created_by": [field.noValidate, field.varchar, 1, 50] },
     { "created_on": [field.noValidate, field.timestamp] },
@@ -155,8 +155,8 @@ const tl_subscription = (method) => [
     { "subscription_name": [field.required, field.string, 1, 50] },
     { "services_available": [field.required, field.varchar, 1, 50] },
     { "services_subscribed": [field.required, field.varchar, 1, 50] },
-    { "subscription_starts_on": [field.noRequired, field.timestamp] },
-    { "subscription_ends_on": [field.noRequired, field.timestamp] },
+    { "subscription_starts_on": [field.noValidate, field.timestamp] },
+    { "subscription_ends_on": [field.noValidate, field.timestamp] },
     { "subsciption_type": [field.required, field.varchar, 1, 50] },
     { "subscription_period": [field.required, field.varchar, 1, 50] },
     { "subscription_fees": [field.required, field.num] },
@@ -187,7 +187,7 @@ const tl_user = (method) => [
     { "first_name": [field.required, field.varchar, 1, 50] },
     { "last_name": [field.required, field.varchar, 1, 50] },
     { "gender": [field.required, field.varchar, 1, 50] },
-    { "dob": [field.noRequired, field.timestamp] },
+    { "dob": [field.noValidate, field.varchar] },
     { "contact_address": [field.required, field.varchar, 1, 50] },
     { "country_code": [field.noRequired, field.num, 1, 2] },
     { "pin": [field.required, field.varchar, 1, 50] },
@@ -196,14 +196,14 @@ const tl_user = (method) => [
     { "attached_photo": [field.noRequired, field.varchar, 1, 50] },
     { "id_proof_type": [field.required, field.varchar, 1, 50] },
     { "id_proof_no": [field.required, field.varchar, 1, 50] },
-    { "attached_id_proof": [field.required, field.varchar, 1, 50] },
+    { "attached_id_proof": [field.required, field.num] },
     { "user_name": [field.required, field.varchar, 1, 50] },
     { "password": [field.required, field.varchar, 1, 50] },
     { "secondary_check_enabled": [field.required, field.varchar, 1, 20] },
     { "otpenabled_phone": [field.noRequired, field.varchar, 1, 1] },
     { "otpenabled_email": [field.noRequired, field.varchar, 1, 1] },
-    { "is_loggedin": [field.noRequired, field.varchar, 1, 1] },
-    { "last_login_time": [field.noRequired, field.timestamp] },
+    { "is_loggedin": [field.noValidate, field.varchar, 1, 1] },
+    { "last_login_time": [field.noValidate, field.timestamp] },
     { "is_activeuser": [field.noRequired, field.varchar, 1, 1] },
     { "deactivate_after_inactive_days": [field.noRequired, field.num] },
     { "session_id": [field.noRequired, field.varchar, 1, 250] },
@@ -223,8 +223,8 @@ const tl_team = (method) => [
     { "team_id": [field.required, field.num, 1, 50] },
     { "team_allocated_to": [field.required, field.varchar, 1, 50] },
     { "team_details": [field.required, field.varchar, 1, 50] },
-    { "team_effective_from": [field.noRequired, field.timestamp] },
-    { "team_effective_until": [field.noRequired, field.timestamp] },
+    { "team_effective_from": [field.noValidate, field.timestamp] },
+    { "team_effective_until": [field.noValidate, field.timestamp] },
     { "team_capacity_per_day": [field.required, field.num] },
     { "action_flag": [field.noValidate, field.varchar, 1, 1] },
     { "created_by": [field.noValidate, field.varchar, 1, 50] },
@@ -288,7 +288,7 @@ const tl_water_plant = (method) => [
     { "id": [method === 'update' ? field.required : field.noRequired, field.num] },
     { "user_id": [field.required, field.num] },
     { "plant_name": [field.required, field.varchar, 1, 50] },
-    { "established_on": [field.noRequired, field.timestamp] },
+    { "established_on": [field.noValidate, field.timestamp] },
     { "plant_type": [field.required, field.varchar, 1, 50] },
     { "plant_contact_no": [field.required, field.varchar, 1, 20] },
     { "plant_contact_email": [field.required, field.varchar, 1, 50] },
@@ -326,7 +326,7 @@ const tl_industry = (method) => [
     { "group_id": [field.noRequired, field.num, 1, 50] },
     { "user_id": [field.required, field.num, 1, 50] },
     { "industry_name": [field.required, field.varchar, 1, 50] },
-    { "established_on": [field.noRequired, field.timestamp] },
+    { "established_on": [field.noValidate, field.timestamp] },
     { "industry_contact_phone": [field.required, field.varchar, 1, 20] },
     { "industry_contact_email": [field.required, field.varchar, 1, 50] },
     { "industry_address": [field.required, field.varchar, 1, 50] },
@@ -444,7 +444,7 @@ const tl_driver = (method) => [
     { "years_of_exp": [field.required, field.num] },
     { "driving_skills": [field.required, field.varchar, 1, 50] },
     { "dl_no": [field.required, field.varchar, 1, 50] },
-    { "dl_expires_on": [field.noRequired, field.timestamp] },
+    { "dl_expires_on": [field.noValidate, field.timestamp] },
     { "employment_type": [field.required, field.varchar, 1, 50] },
     { "driver_address": [field.required, field.varchar, 1, 250] },
     { "driver_phone": [field.required, field.varchar, 1, 20] },
@@ -502,10 +502,10 @@ const tl_delivery_boy = (method) => [
 const tl_vehicle = (method) => [
     { "id": [method === 'update' ? field.required : field.noRequired, field.num] },
     { "group_id": [field.noRequired, field.num, 1, 50] },
-    { "user_id": [field.required, field.num, 1, 50] },
+    // { "user_id": [field.required, field.num, 1, 50] },
     { "transport_agent_id": [field.required, field.num, 1, 50] },
     { "driver_id": [field.required, field.num, 1, 50] },
-    { "vehicle_id": [field.required, field.num, 1, 50] },
+    // { "vehicle_id": [field.required, field.num, 1, 50] },
     { "vehicle_reg_no": [field.required, field.varchar, 1, 50] },
     { "owner_name": [field.required, field.varchar, 1, 50] },
     { "owner_address": [field.required, field.varchar, 1, 250] },
@@ -513,12 +513,12 @@ const tl_vehicle = (method) => [
     { "owner_email": [field.required, field.varchar, 1, 50] },
     { "owner_pin": [field.required, field.varchar, 1, 6] },
     { "country_code": [field.required, field.varchar, 1, 3] },
-    { "insurance_expires_on": [field.noRequired, field.timestamp] },
+    { "insurance_expires_on": [field.noValidate, field.timestamp] },
     { "rc_book_number": [field.required, field.varchar, 1, 50] },
     { "insurance_attachment": [field.required, field.varchar, 1, 50] },
     { "rc_attachment": [field.required, field.varchar, 1, 50] },
     { "vehicle_make_year": [field.required, field.varchar, 1, 50] },
-    { "next_service_due": [field.noRequired, field.timestamp] },
+    { "next_service_due": [field.noValidate, field.timestamp] },
     { "vehicle_term": [field.required, field.varchar, 1, 50] },
     { "vehicle_permit": [field.required, field.varchar, 1, 10] },
     { "gps_enabled": [field.required, field.varchar, 1, 1] },
@@ -545,7 +545,7 @@ const tl_shop_keeper = (method) => [
     { "user_id": [field.required, field.num, 1, 50] },
     { "shop_id": [field.required, field.num, 1, 50] },
     { "shop_name": [field.required, field.varchar, 1, 50] },
-    { "established_on": [field.noRequired, field.timestamp] },
+    { "established_on": [field.noValidate, field.timestamp] },
     { "shop_contact_no": [field.required, field.varchar, 1, 50] },
     { "shop_contact_email": [field.required, field.varchar, 1, 50] },
     { "shop_contact_address": [field.required, field.varchar, 1, 250] },
@@ -626,7 +626,9 @@ const tl_cache = () => [
     // { "document": [field.noRequired, field.json] }
 ];
 
-
+const tl_fileupload = (method) => [
+    { "base64": [field.required, field.varchar] }
+];
 
 
 
@@ -657,5 +659,6 @@ module.exports = {
     tl_util,
     tl_group,
     tl_login,
-    tl_cache
+    tl_cache,
+    tl_fileupload
 }

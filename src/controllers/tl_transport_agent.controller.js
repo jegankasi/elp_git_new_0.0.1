@@ -3,7 +3,7 @@ const tl_transport_agent = require("../services/tl_transport_agent.services");
 const express = require('express');
 const router = express.Router();
 
-router.get('/:id', async (req, res) => {
+router.get('/id/:id', async (req, res) => {
     try {
         const data = await tl_transport_agent.get(req, req.params.id);
         reposne_utils.send_response(req, res, 200, data)
@@ -32,7 +32,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.put('/', async (req, res) => {
+router.put('/id/:id', async (req, res) => {
     try {
         const data = await tl_transport_agent.update(req.app.get("db"), req.body);
         return reposne_utils.send_response(req, res, 200, data);
@@ -41,7 +41,7 @@ router.put('/', async (req, res) => {
     }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/id/:id', async (req, res) => {
     try {
         const data = await tl_transport_agent.deleteRecord(req.app.get("db"), req.params.id);
         return reposne_utils.send_response(req, res, 200, data);

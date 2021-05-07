@@ -2,17 +2,26 @@ const db_fn = require('../configs/db.fn.config');
 const { schema, tl_user } = require('../configs/db.schema.table.config').doc_db_config;
 const formValidation = require('../configs/before.validation').formValidation;
 const formRequiredField = require('../configs/table.model');
-const { getUserId, currentDate, action_flag_A, action_flag_M } = require('../utils/utils');
+const { getUserId, currentDate, action_flag_A, action_flag_M, toJSDate } = require('../utils/utils');
 
-const get = async (dbConnection, id) => {
-    const doc = await db_fn.get_one_from_db(dbConnection, schema, tl_user, { id });
-    return doc;
+const get = async (dbConnection, critera) => {
+    try {
+        const doc = await db_fn.get_one_from_db(dbConnection, schema, tl_user, critera);
+        return doc;
+    } catch (err) {
+        console.log("err----->", err);
+        throw err;
+    }
 }
 
 
 
-const getAll = async (dbConnection) => {
-    const doc = await db_fn.get_all_from_db(dbConnection, schema, tl_user, {});
+const getAll = async (dbConnection, critera) => {
+
+    const fieldSet = ['id', 'user_number', 'first_name', "last_name", "gender", "dob", "contact_address", "contat_email", "id_proof_type", "id_proof_no", "secondary_check_enabled", "otpenabled_phone", "otpenabled_email"];
+
+
+    const doc = await db_fn.get_all_from_db(dbConnection, schema, tl_user, critera, { fields: fieldSet });
     return doc;
 }
 
@@ -27,7 +36,7 @@ const insert = async (dbConnection, body, tokenId) => {
             modified_on: currentDate(),
             modified_by: getUserId(tokenId).userId,
             created_by: getUserId(tokenId).userId,
-            dob: currentDate(),
+            dob: toJSDate(body.dob),
             last_login_time: currentDate()
         }
         return await db_fn.insert_records(dbConnection, schema, tl_user, data);
@@ -43,7 +52,8 @@ const update = async (dbConnection, body, tokenId) => {
             ...body,
             action_flag: action_flag_M,
             modified_on: currentDate(),
-            modified_by: getUserId(tokenId).userId
+            modified_by: getUserId(tokenId).userId,
+            dob: toJSDate(body.dob),
         }
 
 
@@ -51,7 +61,8 @@ const update = async (dbConnection, body, tokenId) => {
         let criteria = {
             id: body.id
         }
-        return await db_fn.update_records(dbConnection, schema, tl_user, criteria, data);
+        let records = await db_fn.update_records(dbConnection, schema, tl_user, criteria, data);
+        return records[0];
     } catch (error) {
         throw error;
     }

@@ -2,7 +2,7 @@ const db_fn = require('../configs/db.fn.config');
 const { schema, tl_vehicle } = require('../configs/db.schema.table.config').doc_db_config;
 const formValidation = require('../configs/before.validation').formValidation;
 const formRequiredField = require('../configs/table.model');
-const { getUserId, currentDate, action_flag_A, action_flag_M } = require('../utils/utils');
+const { getUserId, currentDate, action_flag_A, action_flag_M, toJSDate } = require('../utils/utils');
 const { checkAndInsertProfile } = require('../utils/database_common_function');
 
 const get = async (dbConnection, id) => {
@@ -31,7 +31,8 @@ const insert = async (dbConnection, body, tokenId) => {
         modified_on: currentDate(),
         modified_by: getUserId(tokenId).userId,
         created_by: getUserId(tokenId).userId,
-        next_service_due: currentDate()
+        next_service_due: toJSDate(body.next_service_due)
+
     }
     return await db_fn.insert_records(dbConnection, schema, tl_vehicle, data);
 }
@@ -49,14 +50,16 @@ const update = async (dbConnection, body, tokenId) => {
             profile_id: profile.id,
             action_flag: action_flag_M,
             modified_on: currentDate(),
-            modified_by: getUserId(tokenId).userId
+            modified_by: getUserId(tokenId).userId,
+            next_service_due: toJSDate(body.next_service_due)
         }
 
 
         let criteria = {
             id: body.id
         }
-        return await db_fn.update_records(dbConnection, schema, tl_vehicle, criteria, data);
+        let records = await db_fn.update_records(dbConnection, schema, tl_vehicle, criteria, data);
+        return records[0];
     } catch (error) {
         throw error;
     }

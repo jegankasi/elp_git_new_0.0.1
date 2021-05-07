@@ -6,7 +6,7 @@ const { getUserId, currentDate, action_flag_A, action_flag_M, Group } = require(
 
 
 
-const get = async (dbConnection, criteria, fieldItem) => {
+const get = async (dbConnection, criterea, fieldItem) => {
     const columns = fieldItem ? fieldItem : ['user_type', 'action_flag', "created_by", "created_on", "modified_by", "modified_on", "id"];
     const fieldSet = {
         fields: columns,
@@ -14,12 +14,11 @@ const get = async (dbConnection, criteria, fieldItem) => {
         //     group_name: `${Group} || id`
         // }
     }
-    const doc = await db_fn.get_one_from_db(dbConnection, schema, tl_user_type, criteria, fieldSet);
+    const doc = await db_fn.get_one_from_db(dbConnection, schema, tl_user_type, criterea, fieldSet);
     return doc;
 }
 
 const getAll = async (dbConnection, criteria, fieldItem) => {
-    console.log("getAll----->");
     try {
         const columns = fieldItem ? fieldItem : ['user_type', 'action_flag', "created_by", "created_on", "modified_by", "modified_on", "id"];
         const fieldSet = {
@@ -28,7 +27,6 @@ const getAll = async (dbConnection, criteria, fieldItem) => {
             //     group_name: `${Group} || id`
             // }
         }
-        console.log("criteria-------->", criteria);
         const doc = await db_fn.get_all_from_db(dbConnection, schema, tl_user_type, criteria, fieldSet);
         return doc;
     } catch (error) {

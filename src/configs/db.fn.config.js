@@ -1,6 +1,10 @@
 const get_one_from_db = async (dbConnection, schema, table, criteria, fieldSet) => {
-    const documents = await dbConnection[schema][table].findOne(criteria, fieldSet);
-    return documents;
+    try {
+        const documents = await dbConnection[schema][table].findOne(criteria, fieldSet);
+        return documents;
+    } catch (error) {
+        throw error;
+    }
 }
 
 const get_all_from_db = async (dbConnection, schema, table, criteria, fieldSet) => {

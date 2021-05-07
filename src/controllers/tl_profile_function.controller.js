@@ -6,7 +6,7 @@ const router = express.Router();
 
 
 
-router.get('/:id', async (req, res) => {
+router.get('/id/:id', async (req, res) => {
     try {
         const data = await tl_profile_function_service.get(req.app.get("db"), req.params.id);
         reposne_utils.send_response(req, res, 200, data)
@@ -32,7 +32,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.put('/', async (req, res) => {
+router.put('/id/:id', async (req, res) => {
     try {
         const data = await tl_profile_function_service.update(req.app.get("db"), req.body);
         return reposne_utils.send_response(req, res, 200, data);
@@ -41,7 +41,7 @@ router.put('/', async (req, res) => {
     }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/id/:id', async (req, res) => {
     try {
         const data = await tl_profile_function_service.deleteRecord(req.app.get("db"), req.params.id);
         return reposne_utils.send_response(req, res, 200, data);

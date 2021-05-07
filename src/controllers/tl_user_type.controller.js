@@ -5,9 +5,9 @@ const router = express.Router();
 
 
 
-router.get('/userID/:user_id', async (req, res) => {
+router.get('/user_type/:user_type', async (req, res) => {
     try {
-        const data = await tl_user_tpe_service.getAll(req.app.get("db"), req.query.id);
+        const data = await tl_user_type_service.get(req.app.get("db"), { user_type: req.params.user_type });
         return reposne_utils.send_response(req, res, 200, data)
     } catch (err) {
         return reposne_utils.send_response(req, res, 400, err)
@@ -40,7 +40,7 @@ router.post('/', async (req, res) => {
 
 
 
-router.put('/', async (req, res) => {
+router.put('/id/:id', async (req, res) => {
     try {
         const data = await tl_user_type_service.update(req.app.get("db"), req.body);
         return reposne_utils.send_response(req, res, 200, data);
@@ -49,7 +49,7 @@ router.put('/', async (req, res) => {
     }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/id/:id', async (req, res) => {
     try {
         const data = await tl_user_type_service.deleteRecord(req.app.get("db"), req.params.id);
         return reposne_utils.send_response(req, res, 200, data);
