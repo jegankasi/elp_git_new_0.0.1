@@ -25,7 +25,6 @@ const getProfileAuthAccess = async (dbConnection, profile_id) => {
     try {
         let user_profile_function = await tl_profile_function_service.getAll(dbConnection, { profile_id });
         const item = {};
-        console.log("user_profile_function--->", user_profile_function);
         for (const prfFn of user_profile_function) {
             const authUrl = await getFunction(dbConnection, prfFn.function_id, prfFn.auth_url);
             item[authUrl.function_name] = authUrl.options;
