@@ -14,17 +14,14 @@ app.use(express.static('public'));
 //   createParentPath: true
 // }));//gets the file in the request
 
-// app.use(function (req, res, next) {
-//   var allowedOrigins = ['http://localhost:3200', 'http://localhost:8080', 'http://localhost:3000'];
-//   var origin = req.headers.origin;
-//   if (allowedOrigins.indexOf(origin) > -1) {
-//     res.setHeader('Access-Control-Allow-Origin', "*");
-//   }
-//   res.header('Access-Control-Allow-Methods', 'GET, OPTIONS, POST, PUT, DELETE');
-//   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-//   res.header('Access-Control-Allow-Credentials', true);
-//   return next();
-// });
+app.use(function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Credentials', true);
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Max-Age", "3600");
+  next();
+});
 
 
 (async () => {
@@ -53,8 +50,8 @@ app.use(express.static('public'));
   const authorization = require("./src/middlewares/authorization.middleware");
   const table_router = require("./src/routes/table_router");
   const table_transaction_router = require("./src/routes/table_transaction_router");
-  //app.use("/v1/token", authorization.get_token);
-  //app.use("/v1", authorization.authorize_token);
+  app.use("/v1/token", authorization.get_token);
+  app.use("/v1", authorization.authorize_token);
 
   app.use("/v1/agency", table_router);
   app.use("/v1/transaction", table_transaction_router);

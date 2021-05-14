@@ -79,7 +79,9 @@ const authCheck = async (dbConnection, body) => {
             user.activeRole = "";
             user.profiles = await userProfile(dbConnection, tlUser.id, user.roles);
         }
-        return user;
+
+        await tl_user_service.updateProfile(dbConnection, user, tlUser.id);
+        return tlUser.id;
     } catch (err) {
         throw err;
     }

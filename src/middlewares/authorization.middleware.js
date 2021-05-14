@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const login = require("../services/tl_login.services");
+const tlUser = require("../services/tl_user.services");
 const util = require("../utils/utils");
 
 
@@ -121,11 +122,12 @@ const authorize_token = async (req, res, next) => {
         const token = auth_token && auth_token.replace('Bearer ', '');
         if (!token) return res.status(401).send({ status: 'error', data: 'Unauthorized!' });
         if (!activeRole) return res.status(401).send({ status: 'error', data: 'please mentioned activerole in header!' });
-        jwt.verify(token, process.env.SECRET_JWT_KEY, (err, data) => {
+        jwt.verify(token, process.env.SECRET_JWT_KEY, async (err, data) => {
             if (err) res.status(401).send({ status: 'error', data: 'Unauthorized' });
-            req.user_details = data;
+            let profileData = await tlUser.getProfile(req.app.get("db"), data.userId);
+            req.user_details = profileData['user_profile'];
             if (activeRole) {
-                let userRoleUrls = data.profiles[activeRole];
+                let userRoleUrls = profileData['user_profile'].profiles[activeRole];
                 findUrl(req.originalUrl, req.method, userRoleUrls.authUrl);
             }
             next();
@@ -138,7 +140,7 @@ const authorize_token = async (req, res, next) => {
 const get_token = async (req, res, next) => {
     try {
         const user = await login.authCheck(req.app.get("db"), req.body);
-        const access_token = jwt.sign(user, process.env.SECRET_JWT_KEY, { expiresIn: 60 * 15 });
+        const access_token = jwt.sign({ userId: user }, process.env.SECRET_JWT_KEY, { expiresIn: 60 * 15 });
         return res.status(200).send({ status: 'success', data: { access_token } });
     } catch (err) {
         return res.status(401).send({ status: 'error', data: err });

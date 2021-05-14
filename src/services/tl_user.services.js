@@ -68,6 +68,30 @@ const update = async (dbConnection, body, tokenId) => {
     }
 }
 
+const updateProfile = async (dbConnection, profile, userId) => {
+    try {
+        let criteria = {
+            id: userId
+        }
+        let records = await db_fn.update_records(dbConnection, schema, tl_user, criteria, { user_profile: profile });
+        return records;
+    } catch (err) {
+        throw err;
+    }
+}
+
+const getProfile = async (dbConnection, userId) => {
+    try {
+        let criteria = {
+            id: userId
+        }
+        let records = await db_fn.get_one_from_db(dbConnection, schema, tl_user, criteria, { fields: ['user_profile'] });
+        return records;
+    } catch (err) {
+        throw err;
+    }
+}
+
 const deleteRecord = async (dbConnection, id) => {
     try {
         let criteria = {
@@ -103,5 +127,7 @@ module.exports = {
     insert,
     update,
     saveAll,
-    deleteRecord
+    deleteRecord,
+    updateProfile,
+    getProfile
 }
