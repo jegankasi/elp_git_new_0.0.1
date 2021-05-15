@@ -45,7 +45,6 @@ function getFunctionName(url) {
     let av = "/v1/agency/tl_util",
         splitStr = "v1/agency";
     av = url;
-
     if (av.indexOf(splitStr) > -1) {
         let fInd = av.indexOf(splitStr);
         fInd = fInd + splitStr.length + 1;
@@ -79,22 +78,17 @@ const authorize_token = async (req, res, next) => {
     const auth_token = req.headers['authorization'];
     const activeRole = req.headers['activerole'];
     const findUrl = (requestUrl, requestMethod, userRoleAuthUrls) => {
-
-
-
         let functionName = getFunctionName(requestUrl);
 
         let authUrl = userRoleAuthUrls && userRoleAuthUrls[functionName];
 
-
-
         if (!authUrl) {
-            return res.status(403).send({ status: 'error', data: "there is no authoriazation url" });
+            throw "no authorization url";
         }
         let accessURL = filterURl(requestMethod, authUrl);
 
         if (!isAuthorized(requestUrl, accessURL)) {
-            return res.status(403).send({ status: 'error', data: "Access Forbidden" });
+            throw "Access Forbidden";
         }
 
     }
@@ -111,7 +105,6 @@ const authorize_token = async (req, res, next) => {
         }
         next();
     } catch (err) {
-
         return res.status(401).send({ status: 'error', data: err });
     }
 }
