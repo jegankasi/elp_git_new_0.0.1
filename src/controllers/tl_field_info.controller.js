@@ -42,6 +42,7 @@ router.post('/', async (req, res) => {
 
 router.put('/id/:id', async (req, res) => {
   try {
+
     const data = await tl_field_info_service.update(req.app.get("db"), req.body);
     return reposne_utils.send_response(req, res, 200, data)
   } catch (err) {

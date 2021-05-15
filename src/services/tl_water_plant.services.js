@@ -35,7 +35,7 @@ const insert = async (dbConnection, body, tokenId) => {
             modified_on: currentDate(),
             modified_by: getUserId(tokenId).userId,
             created_by: getUserId(tokenId).userId,
-            established_on: toJSDate(body.established_on),
+            established_on: toJSDate(body.established_on)
         }
         return await db_fn.insert_records(dbConnection, schema, tl_water_plant, data);
     } catch (error) {
