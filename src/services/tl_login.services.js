@@ -9,6 +9,8 @@ const tl_user_type_service = require('./tl_user_type.services');
 const tl_profile_function_service = require('./tl_profile_function.services');
 const tl_function_service = require('./tl_function.services');
 const tl_user_service = require('./tl_user.services');
+const tl_user_profiles = require('./tl_user_profiles.services')
+const tl_menu_functions = require('./tl_menu_functions.services')
 
 
 const profile_short = ["ADMIN", "CTR", "SCTR", "IND", "WP", "TPA", "VEH", "DR", "DB"];
@@ -81,15 +83,27 @@ const authCheck = async (dbConnection, body) => {
         }
 
         await tl_user_service.updateProfile(dbConnection, user, tlUser.id);
-        return tlUser.id;
+        return {'user' : tlUser.id, 'roles' :user.roles} ;
     } catch (err) {
         throw err;
     }
 }
 
-
+const getUserMenu = async (dbConnection, role)=>{
+    try{
+    const userMenuProfile = await tl_user_profiles.getAll(dbConnection, {'user_profile':role});
+    const functionIds = [];
+    for (const profile of userMenuProfile) {
+        functionIds.push(profile['functionid']);
+    }
+    const userMenus = await tl_menu_functions.getAll(dbConnection , {'functionid':functionIds})
+    return userMenus;
+    }catch (err) {
+        throw err;
+    }
+}
 
 
 module.exports = {
-    authCheck
+    authCheck,getUserMenu
 }

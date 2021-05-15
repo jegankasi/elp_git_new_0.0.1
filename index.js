@@ -51,6 +51,7 @@ app.use(function (req, res, next) {
   const table_router = require("./src/routes/table_router");
   const table_transaction_router = require("./src/routes/table_transaction_router");
   app.use("/v1/token", authorization.get_token);
+  app.use("/v1/getUserMenu", authorization.get_user_menu);
   app.use("/v1", authorization.authorize_token);
 
   app.use("/v1/agency", table_router);

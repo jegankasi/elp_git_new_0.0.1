@@ -139,11 +139,20 @@ const authorize_token = async (req, res, next) => {
 
 const get_token = async (req, res, next) => {
     try {
-        const user = await login.authCheck(req.app.get("db"), req.body);
+        const {user, roles} = await login.authCheck(req.app.get("db"), req.body);
         const access_token = jwt.sign({ userId: user }, process.env.SECRET_JWT_KEY, { expiresIn: 60 * 15 });
-        return res.status(200).send({ status: 'success', data: { access_token } });
+        return res.status(200).send({ status: 'success', data: { 'token' : access_token , 'roles' : roles } });
     } catch (err) {
         return res.status(401).send({ status: 'error', data: err });
     }
 }
-module.exports = { authorize_token, get_token }
+
+const get_user_menu = async (req, res, next) => {
+    try {
+        const userMenu = await login.getUserMenu(req.app.get("db"), req.headers['activerole']);
+        return res.status(200).send({ status: 'success', data: { 'menulist' : userMenu } });
+    } catch (err) {
+        return res.status(500).send({ status: 'error', data: err });
+    }
+}
+module.exports = { authorize_token, get_token,get_user_menu }

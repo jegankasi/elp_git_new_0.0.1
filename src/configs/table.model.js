@@ -621,6 +621,14 @@ const tl_fileupload = (method) => [
     { "base64": [field.required, field.varchar] }
 ];
 
+const tl_user_profiles = (method) => [
+    { "user_profile": [field.required, field.varchar] }
+];
+
+const tl_menu_functions = (method) => [
+    { "functionId": [field.required, field.varchar] }
+];
+
 
 
 module.exports = {
@@ -651,5 +659,7 @@ module.exports = {
     tl_group,
     tl_login,
     tl_cache,
-    tl_fileupload
+    tl_fileupload,
+    tl_user_profiles,
+    tl_menu_functions
 }
