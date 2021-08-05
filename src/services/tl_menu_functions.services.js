@@ -5,11 +5,11 @@ const formRequiredField = require('../configs/table.model');
 
 
 const get = async (dbConnection, criteria) => {
-    const doc = await db_fn.get_one_from_db(dbConnection, schema, tl_menu_functions,  criteria);
+    const doc = await db_fn.get_one_from_db(dbConnection, schema, tl_menu_functions, criteria);
     return doc;
 }
 
-const getAll = async (dbConnection,criteria) => {
+const getAll = async (dbConnection, criteria) => {
     const doc = await db_fn.get_all_from_db(dbConnection, schema, tl_menu_functions, criteria);
     return doc;
 }
@@ -51,10 +51,9 @@ const deleteRecord = async (dbConnection, id) => {
     }
 }
 
-module.exports = {
-    get,
-    getAll,
-    insert,
-    update,
-    deleteRecord
-}
+
+module.exports.get = get;
+module.exports.getAll = getAll;
+module.exports.insert = insert;
+module.exports.update = update;
+module.exports.deleteRecord = deleteRecord;

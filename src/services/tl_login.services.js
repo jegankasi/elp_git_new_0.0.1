@@ -1,16 +1,25 @@
 const db_fn = require('../configs/db.fn.config');
 const schema_table = require('../configs/db.schema.table.config').doc_db_config;
-const { schema, tl_profile, tl_user, tl_user_type, tl_profile_function, tl_function, tl_cache } = schema_table;
+const { schema, tl_profile, tl_user, tl_user_roles, tl_profile_function, tl_function, tl_cache } = schema_table;
 const { getUserId, currentDate, action_flag_A, action_flag_M } = require('../utils/utils');
 const formRequiredField = require('../configs/table.model');
 const formValidation = require('../configs/before.validation').formValidation;
 const tl_profile_service = require('./tl_profile.services');
-const tl_user_type_service = require('./tl_user_type.services');
+const tl_user_roles_service = require('./tl_user_roles.services');
 const tl_profile_function_service = require('./tl_profile_function.services');
 const tl_function_service = require('./tl_function.services');
 const tl_user_service = require('./tl_user.services');
 const tl_user_profiles = require('./tl_user_profiles.services')
 const tl_menu_functions = require('./tl_menu_functions.services')
+const tl_water_plant_service = require('./tl_water_plant.services');
+const tl_industry_service = require('./tl_industry.services');
+const tl_contractor_service = require('./tl_contractor.services');
+const tl_delivery_boy_service = require('./tl_delivery_boy.services');
+const tl_driver_service = require('./tl_driver.services');
+const tl_sub_contractor_service = require('./tl_sub_contractor.services');
+const tl_transport_agent_service = require('./tl_transport_agent.services');
+const tl_vehicle_service = require('./tl_vehicle.services');
+const tl_group_service = require("./tl_group.services");
 
 
 const profile_short = ["ADMIN", "CTR", "SCTR", "IND", "WP", "TPA", "VEH", "DR", "DB"];
@@ -38,26 +47,35 @@ const getProfileAuthAccess = async (dbConnection, profile_id) => {
 }
 
 
-
+// { fields: ['type', 'parent_id', 'user_role_id'] }
 const userProfile = async (dbConnection, user_id, roles) => {
-    let user_profiles = await tl_profile_service.getAll(dbConnection, { user_type_id: user_id, type: "U" });
-    let profiles = {};
+    const user_profile_List = [];
+    let user_profiles = await tl_profile_service.getAll(dbConnection, { user_role_id: user_id, type: "U" });
     for (const rec of user_profiles) {
-        let userProfile = {};
-        let profile_rec = await tl_profile_service.get(dbConnection, { id: rec.parent_id });
+        let profile_rec = await tl_profile_service.get(dbConnection, { profile_id: rec.parent_id });
         if (profile_rec) {
-            let userType = await tl_user_type_service.get(dbConnection, { id: profile_rec.user_type_id });
+            let userType = await tl_user_roles_service.get(dbConnection, { user_role_id: profile_rec.user_role_id });
+            // const user_profile = {};
             if (userType) {
-                userProfile.user_type_id = userType.id;
-                userProfile.user_type = userType.user_type;
-                userProfile.profile_id = rec.id;
-                userProfile.authUrl = await getProfileAuthAccess(dbConnection, profile_rec.id);
-                roles.push(userType.user_type);
-                profiles[userType.user_type] = userProfile;
+                // user_profile.user_role_id = profile_rec.user_role_id;
+                //user_profile.user_role = userType.user_role;
+                // user_profile.profile_id = rec.profile_id;
+                roles.push(userType.user_role);
+                //user_profile_List.push(user_profile);
             }
         }
     }
-    return profiles;
+    return user_profile_List;
+}
+
+const getUserRoleOfGroup = async (dbConnection, user_id, service, fields, user_type) => {
+    let group = [];
+    let userRoles = await service.getAll(dbConnection, "", { user_id }, { fields });
+    for (const role of userRoles) {
+        let groupId = await tl_group_service.getAll(dbConnection, "", { type_of_user_id: role[fields[0]], user_type }, ['parent_id']);
+        group.push({ [fields[0]]: role[fields[0]], group_id: groupId.map(item => item.parent_id) });
+    }
+    return group;
 }
 
 
@@ -65,45 +83,57 @@ const authCheck = async (dbConnection, body) => {
     try {
         await formValidation(formRequiredField.tl_login("insert"), body);
         let criteria = {
-            ...body,
+            user_id: body.user_id,
+            password: body.password,
         }
-
         const user = {};
         const tlUser = await tl_user_service.get(dbConnection, criteria);
         if (tlUser) {
-            user.user_id = tlUser.id;
+            user.user_id = tlUser.user_id;
             user.first_name = tlUser.first_name;
             user.last_name = tlUser.last_name;
-            user.user_number = tlUser.user_number;
             user.gender = tlUser.gender;
             user.country_code = tlUser.country_code;
             user.roles = [];
-            user.activeRole = "";
-            user.profiles = await userProfile(dbConnection, tlUser.id, user.roles);
+            await userProfile(dbConnection, tlUser.user_id, user.roles);
+            user.WP = await getUserRoleOfGroup(dbConnection, tlUser.user_id, tl_water_plant_service, ['water_plant_id'], 'WP');
+            user.IND = await getUserRoleOfGroup(dbConnection, tlUser.user_id, tl_industry_service, ["industry_id"], "IND");
+            user.CTR = await getUserRoleOfGroup(dbConnection, tlUser.user_id, tl_contractor_service, ["contractor_id"], "CTR");
+            user.DB = await getUserRoleOfGroup(dbConnection, tlUser.user_id, tl_delivery_boy_service, ["delivery_boy_id"], "DB");
+            user.DR = await getUserRoleOfGroup(dbConnection, tlUser.user_id, tl_driver_service, ["driver_id"], "DR");
+            user.SCTR = await getUserRoleOfGroup(dbConnection, tlUser.user_id, tl_sub_contractor_service, ["sub_contractor_id"], "SCTR");
+            user.TPA = await getUserRoleOfGroup(dbConnection, tlUser.user_id, tl_transport_agent_service, ["transport_agent_id"], "TPA");
+            user.VEH = await getUserRoleOfGroup(dbConnection, tlUser.user_id, tl_vehicle_service, ["vehicle_id"], "VEH");
+            await tl_user_service.updateProfile(dbConnection, user, user.user_id);
+        } else {
+            return null;
         }
-
-        await tl_user_service.updateProfile(dbConnection, user, tlUser.id);
-        return {'user' : tlUser.id, 'roles' :user.roles} ;
+        return {
+            first_name: user.first_name,
+            last_name: user.last_name,
+            user_id: user.user_id,
+            gender: user.gender,
+            country: user.country_code,
+            roles: user.roles
+        };
     } catch (err) {
         throw err;
     }
 }
 
-const getUserMenu = async (dbConnection, role)=>{
-    try{
-    const userMenuProfile = await tl_user_profiles.getAll(dbConnection, {'user_profile':role});
-    const functionIds = [];
-    for (const profile of userMenuProfile) {
-        functionIds.push(profile['functionid']);
-    }
-    const userMenus = await tl_menu_functions.getAll(dbConnection , {'functionid':functionIds})
-    return userMenus;
-    }catch (err) {
+const getUserMenu = async (dbConnection, role) => {
+    try {
+        const userMenuProfile = await tl_user_profiles.getAll(dbConnection, { 'user_profile': role });
+        const functionIds = [];
+        for (const profile of userMenuProfile) {
+            functionIds.push(profile['functionid']);
+        }
+        const userMenus = await tl_menu_functions.getAll(dbConnection, { 'functionid': functionIds })
+        return userMenus;
+    } catch (err) {
         throw err;
     }
 }
 
-
-module.exports = {
-    authCheck,getUserMenu
-}
+module.exports.authCheck = authCheck;
+module.exports.getUserMenu = getUserMenu;

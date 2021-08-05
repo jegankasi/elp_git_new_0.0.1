@@ -85,6 +85,14 @@ const getUserId = (tokenId) => {
     }
 }
 
+const isActiveRoleAllowed = (userSession, id, group_id, active_role_id) => {
+    let group = Array.isArray(userSession[userSession.activeRole]) && userSession[userSession.activeRole].filter(data => data[id]).map(ob => ob[id] == active_role_id && ob.group_id.find((itms) => itms));
+    if (group[0] != group_id) {
+        throw "group id does not match";
+    }
+    return true;
+}
+
 module.exports = {
     check_required_fields,
     decrypt,
@@ -98,5 +106,6 @@ module.exports = {
     action_flag_D,
     Group,
     allowedUrls,
-    toJSDate
+    toJSDate,
+    isActiveRoleAllowed
 }

@@ -68,10 +68,8 @@ const saveAll = async (dbConnection, body) => {
     }
 }
 
-module.exports = {
-    get,
-    getAll,
-    insert,
-    update,
-    saveAll
-}
+module.exports.get = get;
+module.exports.getAll = getAll;
+module.exports.insert = insert;
+module.exports.update = update;
+module.exports.saveAll = saveAll;

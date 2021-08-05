@@ -77,11 +77,4 @@ const saveAll = async (dbConnection, body) => {
     }
 }
 
-module.exports = {
-    get,
-    getAll,
-    insert,
-    update,
-    saveAll,
-    deleteRecord
-}
+

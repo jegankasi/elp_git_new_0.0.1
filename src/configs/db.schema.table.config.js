@@ -1,6 +1,7 @@
 const doc_db_config = {
     schema: "etab_schema",
-    tl_audit_log: "tl_audit_log",
+    tl_transaction_audit_log: "tl_transaction_audit_log",
+    tl_transaction_order: "tl_transaction_order",
     tl_contractor: "tl_contractor",
     tl_customers: "tl_customers",
     tl_delivery_boy: "tl_delivery_boy",
@@ -8,7 +9,7 @@ const doc_db_config = {
     tl_field_info: 'tl_field_info',
     tl_field_labels: "tl_field_labels",
     tl_function: "tl_function",
-    tl_user_type: "tl_user_type",
+    tl_user_roles: "tl_user_roles",
     tl_industry: "tl_industry",
     tl_profile: "tl_profile",
     tl_profile_function: 'tl_profile_function',
@@ -27,8 +28,11 @@ const doc_db_config = {
     tl_group: "tl_group",
     tl_base64: "tl_base64",
     tl_user_profiles: "tl_user_profiles",
-    tl_menu_functions: "tl_menu_functions"
-
+    tl_menu_functions: "tl_menu_functions",
+    tl_section_form_fields: "tl_section_form_fields",
+    tl_products_inventory: "tl_products_inventory",
+    tl_transaction_order_quotation: "tl_transaction_order_quotation",
+    tl_transport_mapping: "tl_transport_mapping"
 }
 
 module.exports = {

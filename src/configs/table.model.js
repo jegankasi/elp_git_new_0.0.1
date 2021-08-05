@@ -96,10 +96,9 @@ const tl_field_labels = [
 ]
 
 const tl_profile = (method) => [
-    { "id": [method === 'update' ? field.required : field.noRequired, field.num] },
+    { "profile": [method === 'update' ? field.required : field.noRequired, field.num] },
     { "parent_id": [field.required, field.num, 1, 50] },
-    { "user_type_id": [field.required, field.num, 1, 50] },
-    { "description": [field.required, field.varchar, 1, 50] },
+    { "user_role_id": [field.required, field.num, 1, 50] },
     { "action_flag": [field.noValidate, field.varchar, 1, 1] },
     { "created_by": [field.noValidate, field.varchar, 1, 50] },
     { "created_on": [field.noValidate, field.timestamp] },
@@ -130,7 +129,7 @@ const tl_profile_function = (method) => [
     { "modified_on": [field.noValidate, field.timestamp] }
 ];
 
-const tl_user_type = (method) => [
+const tl_user_roles = (method) => [
     { "id": [method === 'update' ? field.required : field.noRequired, field.num] },
     { "user_type": [field.required, field.varchar, 1, 50] },
     { "action_flag": [field.noValidate, field.varchar, 1, 1] },
@@ -174,7 +173,6 @@ const tl_subscription = (method) => [
 ];
 
 const tl_user = (method) => [
-    { "id": [method === 'update' ? field.required : field.noRequired, field.num] },
     { "services_granted": [field.noRequired, field.varchar, 1, 50] },
     { "first_name": [field.required, field.varchar, 1, 50] },
     { "last_name": [field.required, field.varchar, 1, 50] },
@@ -277,8 +275,6 @@ const tl_tables = [
 ];
 
 const tl_water_plant = (method) => [
-    { "id": [method === 'update' ? field.required : field.noRequired, field.num] },
-    { "user_id": [field.required, field.num] },
     { "plant_name": [field.required, field.varchar, 1, 50] },
     { "established_on": [field.noValidate, field.timestamp] },
     { "plant_type": [field.required, field.varchar, 1, 50] },
@@ -296,9 +292,9 @@ const tl_water_plant = (method) => [
     { "having_own_transport": [field.required, field.varchar, 1, 1] },
     { "having_own_deliveryteam": [field.required, field.varchar, 1, 1] },
     { "is_delivery_supported": [field.required, field.varchar, 1, 1] },
-    { "attached_wp_photo": [field.required, field.num, 1, 50] },
-    { "attached_isi_reference": [field.required, field.num, 1, 50] },
-    { "attached_fssai_reference": [field.required, field.num, 1, 50] },
+    { "attached_wp_photo": [field.required, field.num] },
+    { "attached_isi_reference": [field.required, field.varchar, 1, 50] },
+    { "attached_fssai_reference": [field.required, field.varchar, 1, 50] },
     { "available_on_mon_fri": [field.required, field.varchar, 1, 50] },
     { "available_on_sat": [field.required, field.varchar, 1, 50] },
     { "available_on_sun": [field.required, field.varchar, 1, 50] },
@@ -314,9 +310,6 @@ const tl_water_plant = (method) => [
 ];
 
 const tl_industry = (method) => [
-    { "id": [method === 'update' ? field.required : field.noRequired, field.num] },
-    { "group_id": [field.noRequired, field.num, 1, 50] },
-    { "user_id": [field.required, field.num, 1, 50] },
     { "industry_name": [field.required, field.varchar, 1, 50] },
     { "established_on": [field.noValidate, field.timestamp] },
     { "industry_contact_phone": [field.required, field.varchar, 1, 20] },
@@ -462,8 +455,6 @@ const tl_driver = (method) => [
 ];
 
 const tl_delivery_boy = (method) => [
-    { "id": [method === 'update' ? field.required : field.noRequired, field.num] },
-    { "user_id": [field.required, field.num, 1, 50] },
     { "transport_agent_id": [field.required, field.num, 1, 50] },
     { "deliveryboy_name": [field.required, field.varchar, 1, 50] },
     { "deliveryboy_address": [field.required, field.varchar, 1, 250] },
@@ -491,12 +482,9 @@ const tl_delivery_boy = (method) => [
 ];
 
 const tl_vehicle = (method) => [
-    { "id": [method === 'update' ? field.required : field.noRequired, field.num] },
-    // { "group_id": [field.noRequired, field.num, 1, 50] },
-    // { "user_id": [field.required, field.num, 1, 50] },
+    { "user_id": [field.required, field.num, 1, 50] },
     { "transport_agent_id": [field.required, field.num, 1, 50] },
-    // { "driver_id": [field.required, field.num, 1, 50] },
-    // { "vehicle_id": [field.required, field.num, 1, 50] },
+    { "driver_id": [field.required, field.num] },
     { "vehicle_reg_no": [field.required, field.varchar, 1, 50] },
     { "owner_name": [field.required, field.varchar, 1, 50] },
     { "owner_address": [field.required, field.varchar, 1, 250] },
@@ -515,7 +503,7 @@ const tl_vehicle = (method) => [
     { "gps_enabled": [field.required, field.varchar, 1, 1] },
     { "fasttag_id": [field.required, field.varchar, 1, 50] },
     { "kms_per_litre": [field.required, field.num] },
-    { "vehicle_capacity": [field.required, field.num] },
+    { "vehicle_capacity": [field.required, field.varchar] },
     { "vehicle_type": [field.required, field.varchar, 1, 50] },
     { "available_on_mon_fri": [field.required, field.varchar, 1, 50] },
     { "available_on_sat": [field.required, field.varchar, 1, 50] },
@@ -606,9 +594,23 @@ const tl_group = (method) => [
 ];
 
 
+const tl_transaction_order_quotation = (method) => [
+    { "transaction_id": [field.required, field.varchar] },
+    { "product_id": [field.required, field.varchar, 1, 100] },
+    { "contractor_rate": [field.noValidate, field.varchar, 1, 50] },
+    { "status": [field.required, field.varchar] },
+    { "quantity": [method === 'update' ? field.noRequired : field.required, field.num] },
+    { "action_flag": [field.noValidate, field.varchar, 1, 1] },
+    { "created_by": [field.noValidate, field.varchar, 1, 50] },
+    { "created_on": [field.noValidate, field.timestamp] },
+    { "modified_by": [field.noValidate, field.varchar, 1, 50] },
+    { "modified_on": [field.noValidate, field.timestamp] }
+];
+
+
 
 const tl_login = () => [
-    { "user_number": [field.required, field.varchar, 1, 50] },
+    { "user_id": [field.required, field.varchar, 1, 50] },
     { "password": [field.required, field.varchar, 1, 50] }
 ];
 
@@ -630,6 +632,14 @@ const tl_menu_functions = (method) => [
 ];
 
 
+const tl_transport_mapping = (method) => [
+    { "transaction_id": [field.required, field.varchar] },
+    { "driver_id": [field.required, field.num, 1, 100] },
+    { "delivery_boy_id": [field.required, field.num, 1, 50] },
+    { "vehicle_id": [field.required, field.num] },
+];
+
+
 
 module.exports = {
     tl_field_info,
@@ -637,7 +647,7 @@ module.exports = {
     tl_profile,
     tl_function,
     tl_profile_function,
-    tl_user_type,
+    tl_user_roles,
     tl_subscription,
     tl_user,
     tl_team,
@@ -661,5 +671,7 @@ module.exports = {
     tl_cache,
     tl_fileupload,
     tl_user_profiles,
-    tl_menu_functions
+    tl_menu_functions,
+    tl_transaction_order_quotation,
+    tl_transport_mapping
 }

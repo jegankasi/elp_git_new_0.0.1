@@ -9,7 +9,6 @@ const get = async (dbConnection, critera) => {
         const doc = await db_fn.get_one_from_db(dbConnection, schema, tl_user, critera);
         return doc;
     } catch (err) {
-        console.log("err----->", err);
         throw err;
     }
 }
@@ -18,7 +17,7 @@ const get = async (dbConnection, critera) => {
 
 const getAll = async (dbConnection, critera) => {
 
-    const fieldSet = ['id', 'user_number', 'first_name', "last_name", "gender", "dob", "contact_address", "contat_email", "id_proof_type", "id_proof_no", "secondary_check_enabled", "otpenabled_phone", "otpenabled_email"];
+    const fieldSet = ['user_id', 'user_number', 'first_name', "last_name", "gender", "dob", "contact_address", "contat_email", "id_proof_type", "id_proof_no", "secondary_check_enabled", "otpenabled_phone", "otpenabled_email"];
 
 
     const doc = await db_fn.get_all_from_db(dbConnection, schema, tl_user, critera, { fields: fieldSet });
@@ -26,7 +25,7 @@ const getAll = async (dbConnection, critera) => {
 }
 
 
-const insert = async (dbConnection, body, tokenId) => {
+const insert = async (dbConnection, userSession, body, tokenId) => {
     try {
         await formValidation(formRequiredField.tl_user("insert"), body);
         let data = {
@@ -34,11 +33,16 @@ const insert = async (dbConnection, body, tokenId) => {
             action_flag: action_flag_A,
             created_on: currentDate(),
             modified_on: currentDate(),
-            modified_by: getUserId(tokenId).userId,
-            created_by: getUserId(tokenId).userId,
+            modified_by: userSession.user_id,
+            created_by: userSession.user_id,
             dob: toJSDate(body.dob),
-            last_login_time: currentDate()
+            last_login_time: currentDate(),
+            services_granted: 'Y',
+            is_activeuser: 'Y',
+            is_loggedin: 'N'
         }
+        delete data.user_id;
+        delete data.user_number;
         return await db_fn.insert_records(dbConnection, schema, tl_user, data);
     } catch (error) {
         throw error;
@@ -71,7 +75,7 @@ const update = async (dbConnection, body, tokenId) => {
 const updateProfile = async (dbConnection, profile, userId) => {
     try {
         let criteria = {
-            id: userId
+            user_id: userId
         }
         let records = await db_fn.update_records(dbConnection, schema, tl_user, criteria, { user_profile: profile });
         return records;
@@ -80,10 +84,10 @@ const updateProfile = async (dbConnection, profile, userId) => {
     }
 }
 
-const getProfile = async (dbConnection, userId) => {
+const getProfile = async (dbConnection, user_id) => {
     try {
         let criteria = {
-            id: userId
+            user_id
         }
         let records = await db_fn.get_one_from_db(dbConnection, schema, tl_user, criteria, { fields: ['user_profile'] });
         return records;
@@ -121,13 +125,12 @@ const saveAll = async (dbConnection, body) => {
     }
 }
 
-module.exports = {
-    get,
-    getAll,
-    insert,
-    update,
-    saveAll,
-    deleteRecord,
-    updateProfile,
-    getProfile
-}
+
+module.exports.get = get;
+module.exports.getAll = getAll;
+module.exports.insert = insert;
+module.exports.update = update;
+module.exports.saveAll = saveAll;
+module.exports.deleteRecord = deleteRecord;
+module.exports.updateProfile = updateProfile;
+module.exports.getProfile = getProfile;

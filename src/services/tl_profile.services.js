@@ -17,7 +17,7 @@ const formValidation = require('../configs/before.validation').formValidation;
 
 
 const get = async (dbConnection, criteria, fieldItem) => {
-    const columns = fieldItem ? fieldItem : ['user_type_id', 'parent_id', 'action_flag', "created_by", "created_on", "modified_by", "modified_on", "id"];
+    const columns = fieldItem ? fieldItem : ['user_role_id', 'parent_id', 'action_flag', "created_by", "created_on", "modified_by", "modified_on", "profile_id"];
     const fieldSet = {
         fields: columns,
         // exprs: {
@@ -34,11 +34,20 @@ const get = async (dbConnection, criteria, fieldItem) => {
 }
 
 
-const getAll = async (dbConnection, criteria) => {
+const getAll = async (dbConnection, criteria, fieldItem) => {
     try {
+
+        const columns = fieldItem ? fieldItem : ['user_role_id', 'parent_id', "profile_id"];
+        const fieldSet = {
+            fields: columns,
+            // exprs: {
+            //     group_name: `${Group} || id`
+            // }
+        }
         const doc = await db_fn.get_all_from_db(dbConnection, schema, tl_profile, criteria, {
+            fields: fieldSet.fields,
             order: [
-                { field: "id", direction: "asc" }
+                { field: "profile_id", direction: "asc" }
             ]
         });
         return doc;
@@ -54,9 +63,7 @@ const insert = async (dbConnection, body, tokenId) => {
             ...body,
             action_flag: action_flag_A,
             created_on: currentDate(),
-            modified_on: currentDate(),
-            modified_by: getUserId(tokenId).userId,
-            created_by: getUserId(tokenId).userId
+            modified_on: currentDate()
         }
         const doc = await db_fn.insert_records(dbConnection, schema, tl_profile, data);
         return doc;
@@ -115,11 +122,10 @@ const deleteRecord = async (dbConnection, id) => {
     }
 }
 
-module.exports = {
-    get,
-    getAll,
-    insert,
-    update,
-    saveAll,
-    deleteRecord
-}
+
+module.exports.get = get;
+module.exports.getAll = getAll;
+module.exports.insert = insert;
+module.exports.update = update;
+module.exports.saveAll = saveAll;
+module.exports.deleteRecord = deleteRecord;

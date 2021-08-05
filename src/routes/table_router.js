@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const tl_audit_log = require('../controllers/tl_audit_log.controller');
+const tl_transaction_order = require('../controllers/tl_transaction_order.controller');
 const tl_contractor = require('../controllers/tl_contractor.controller');
 const tl_customers = require('../controllers/tl_customers.controller');
 const tl_delivery_boy = require('../controllers/tl_delivery_boy.controller');
@@ -27,9 +27,12 @@ const tl_util = require('../controllers/tl_util.controller');
 const tl_group = require('../controllers/tl_group.controller');
 const tl_login = require('../controllers/tl_login.controller');
 const uploadFile = require('../controllers/file-upload/uploadFiles.controller');
+const tl_user_refernce = require('../controllers/tl_user_reference.controller');
+const tl_transport_mapping = require('../controllers/tl_transport_mapping.controller');
+
 
 router.use('/tl_util', tl_util);
-router.use('/tl_audit_log', tl_audit_log);
+//router.use('/tl_audit_log', tl_audit_log);
 router.use('/tl_contractor', tl_contractor);
 router.use('/tl_customer', tl_customers);
 router.use('/tl_delivery_boy', tl_delivery_boy);
@@ -46,8 +49,6 @@ router.use('/tl_sequence', tl_sequence);
 router.use('/tl_shop_keeper', tl_shop_keeper);
 router.use('/tl_sub_contractor', tl_sub_contractor);
 router.use('/tl_subscription', tl_subscription);
-router.use('/tl_tables', tl_tables);
-router.use('/tl_team', tl_team);
 router.use('/tl_transport_agent', tl_transport_agent);
 router.use('/tl_user', tl_user);
 router.use('/tl_vehicle', tl_vehicle);
@@ -55,5 +56,9 @@ router.use('/tl_water_plant', tl_water_plant);
 router.use('/tl_group', tl_group);
 router.use('/tl_login', tl_login);
 router.use('/uploadFile', uploadFile);
+router.use('/tl_user_reference', tl_user_refernce);
+router.use('/tl_transaction_order', tl_transaction_order);
+router.use('/tl_transport_mapping', tl_transport_mapping);
+
 
 module.exports = router;

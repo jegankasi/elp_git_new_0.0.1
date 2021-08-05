@@ -2,67 +2,83 @@ const db_fn = require('../configs/db.fn.config');
 const { schema, tl_water_plant } = require('../configs/db.schema.table.config').doc_db_config;
 const formValidation = require('../configs/before.validation').formValidation;
 const formRequiredField = require('../configs/table.model');
-const { getUserId, currentDate, action_flag_A, action_flag_M, toJSDate } = require('../utils/utils');
+const { currentDate, action_flag_A, action_flag_M, toJSDate } = require('../utils/utils');
 const { checkAndInsertProfile } = require('../utils/database_common_function');
+const tl_group_service = require('../services/tl_group.services');
 
 
 
-const get = async (dbConnection, id) => {
-    const doc = await db_fn.get_one_from_db(dbConnection, schema, tl_water_plant, { id });
-    return doc;
-}
-
-const getAll = async (dbConnection) => {
-    const doc = await db_fn.get_all_from_db(dbConnection, schema, tl_water_plant, {});
+const get = async (dbConnection, userSession, water_plant_id) => {
+    const doc = await db_fn.get_one_from_db(dbConnection, schema, tl_water_plant, { water_plant_id });
     return doc;
 }
 
 
-const insert = async (dbConnection, body, tokenId) => {
+const getByUserId = async (dbConnection, userSession, user_id) => {
+    let criteria = {
+        user_id
+    }
+
+    const doc = await db_fn.get_all_from_db(dbConnection, schema, tl_water_plant, criteria);
+    return doc;
+}
+
+const getAll = async (dbConnection, userSession, criteria, fieldSet) => {
     try {
-
-        await formValidation(formRequiredField.tl_water_plant("insert"), body);
-        let profile = await checkAndInsertProfile(dbConnection, body.user_id, "WP");
-
-        if (!profile) {
-            throw "error is occured on generating profile_id"
-        }
-        let data = {
-            ...body,
-            profile_id: profile.id,
-            action_flag: action_flag_A,
-            created_on: currentDate(),
-            modified_on: currentDate(),
-            modified_by: getUserId(tokenId).userId,
-            created_by: getUserId(tokenId).userId,
-            established_on: toJSDate(body.established_on)
-        }
-        return await db_fn.insert_records(dbConnection, schema, tl_water_plant, data);
+        const doc = await db_fn.get_all_from_db(dbConnection, schema, tl_water_plant, criteria, fieldSet);
+        return doc;
     } catch (error) {
         throw error;
     }
 }
 
-const update = async (dbConnection, body, tokenId) => {
+
+const insert = async (dbConnection, userSession, body) => {
+    try {
+        await formValidation(formRequiredField.tl_water_plant("insert"), body);
+        let response = await dbConnection.withTransaction(async tx => {
+            await checkAndInsertProfile(tx, body.user_id, "WP", userSession.user_id);
+            let data = {
+                ...body,
+                action_flag: action_flag_A,
+                created_on: currentDate(),
+                modified_on: currentDate(),
+                modified_by: userSession.user_id,
+                created_by: userSession.user_id,
+                established_on: toJSDate(body.established_on)
+            }
+            delete data.water_plant_id;
+            delete data.water_plant_number;
+            let waterPlant = await db_fn.insert_records(tx, schema, tl_water_plant, data);
+            if (userSession.activeRole === 'ADMIN') {
+                let adminRecord = await tl_group_service.getByUserType(tx, userSession, 'ADMIN');
+                await tl_group_service.insertTypeOfUser(tx, userSession, { group_id: adminRecord.parent_id, type_of_user_id: waterPlant.water_plant_id, user_type: "WP" })
+            }
+            return waterPlant;
+        });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+}
+
+const update = async (dbConnection, userSession, body, water_plant_id) => {
     try {
         await formValidation(formRequiredField.tl_water_plant("update"), body);
-        let profile = await checkAndInsertProfile(dbConnection, body.user_id, "WP");
+        let profile = await checkAndInsertProfile(dbConnection, body.user_id, "WP", userSession.user_id);
 
         if (!profile) {
             throw "error is occured on generating profile_id"
         }
         let data = {
             ...body,
-            profile_id: profile.id,
             action_flag: action_flag_M,
             modified_on: currentDate(),
-            modified_by: getUserId(tokenId).userId,
+            modified_by: userSession.user_id,
             established_on: toJSDate(body.established_on)
         }
-
-
         let criteria = {
-            id: body.id
+            water_plant_id: water_plant_id
         }
         let records = await db_fn.update_records(dbConnection, schema, tl_water_plant, criteria, data);
         return records[0];
@@ -100,11 +116,9 @@ const saveAll = async (dbConnection, body) => {
     }
 }
 
-module.exports = {
-    get,
-    getAll,
-    insert,
-    update,
-    saveAll,
-    deleteRecord
-}
+module.exports.get = get;
+module.exports.getAll = getAll;
+module.exports.insert = insert;
+module.exports.update = update;
+module.exports.saveAll = saveAll;
+module.exports.deleteRecord = deleteRecord;

@@ -1,5 +1,5 @@
 const db_fn = require('../configs/db.fn.config');
-const { schema, tl_user_type } = require('../configs/db.schema.table.config').doc_db_config;
+const { schema, tl_user_roles } = require('../configs/db.schema.table.config').doc_db_config;
 const formValidation = require('../configs/before.validation').formValidation;
 const formRequiredField = require('../configs/table.model');
 const { getUserId, currentDate, action_flag_A, action_flag_M, Group } = require('../utils/utils');
@@ -7,27 +7,27 @@ const { getUserId, currentDate, action_flag_A, action_flag_M, Group } = require(
 
 
 const get = async (dbConnection, criterea, fieldItem) => {
-    const columns = fieldItem ? fieldItem : ['user_type', 'action_flag', "created_by", "created_on", "modified_by", "modified_on", "id"];
+    const columns = fieldItem ? fieldItem : ['user_role', 'action_flag', "created_by", "created_on", "modified_by", "modified_on", "user_role_id"];
     const fieldSet = {
         fields: columns,
         // exprs: {
         //     group_name: `${Group} || id`
         // }
     }
-    const doc = await db_fn.get_one_from_db(dbConnection, schema, tl_user_type, criterea, fieldSet);
+    const doc = await db_fn.get_one_from_db(dbConnection, schema, tl_user_roles, criterea, fieldSet);
     return doc;
 }
 
 const getAll = async (dbConnection, criteria, fieldItem) => {
     try {
-        const columns = fieldItem ? fieldItem : ['user_type', 'action_flag', "created_by", "created_on", "modified_by", "modified_on", "id"];
+        const columns = fieldItem ? fieldItem : ['user_role', 'action_flag', "created_by", "created_on", "modified_by", "modified_on", "user_role_id"];
         const fieldSet = {
             fields: columns,
             // exprs: {
             //     group_name: `${Group} || id`
             // }
         }
-        const doc = await db_fn.get_all_from_db(dbConnection, schema, tl_user_type, criteria, fieldSet);
+        const doc = await db_fn.get_all_from_db(dbConnection, schema, tl_user_roles, criteria, fieldSet);
         return doc;
     } catch (error) {
         throw error;
@@ -37,7 +37,7 @@ const getAll = async (dbConnection, criteria, fieldItem) => {
 
 const insert = async (dbConnection, body, tokenId) => {
     try {
-        await formValidation(formRequiredField.tl_user_type('insert'), body);
+        await formValidation(formRequiredField.tl_user_roles_service('insert'), body);
         let data = {
             ...body,
             action_flag: action_flag_A,
@@ -46,7 +46,7 @@ const insert = async (dbConnection, body, tokenId) => {
             modified_by: getUserId(tokenId).userId,
             created_by: getUserId(tokenId).userId
         }
-        return await db_fn.insert_records(dbConnection, schema, tl_user_type, data);
+        return await db_fn.insert_records(dbConnection, schema, tl_user_roles, data);
     } catch (error) {
         throw error;
     }
@@ -73,7 +73,7 @@ const saveAll = async (dbConnection, body) => {
 
 const update = async (dbConnection, body, tokenId) => {
     try {
-        await formValidation(formRequiredField.tl_user_type('update'), body);
+        await formValidation(formRequiredField.tl_user_roles_service('update'), body);
         let data = {
             ...body,
             action_flag: action_flag_M,
@@ -85,7 +85,7 @@ const update = async (dbConnection, body, tokenId) => {
         let criteria = {
             id: body.id
         }
-        return await db_fn.update_records(dbConnection, schema, tl_user_type, criteria, data);
+        return await db_fn.update_records(dbConnection, schema, tl_user_roles, criteria, data);
     } catch (error) {
         throw error;
     }
@@ -96,18 +96,16 @@ const deleteRecord = async (dbConnection, id) => {
         let criteria = {
             id
         }
-        await db_fn.delete_records(dbConnection, schema, tl_user_type, criteria);
+        await db_fn.delete_records(dbConnection, schema, tl_user_roles, criteria);
         return "deleted";
     } catch (err) {
         throw err;
     }
 }
 
-module.exports = {
-    get,
-    getAll,
-    insert,
-    update,
-    saveAll,
-    deleteRecord
-}
+module.exports.get = get;
+module.exports.getAll = getAll;
+module.exports.insert = insert;
+module.exports.update = update;
+module.exports.saveAll = saveAll;
+module.exports.deleteRecord = deleteRecord;

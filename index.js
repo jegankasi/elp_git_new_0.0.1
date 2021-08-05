@@ -50,12 +50,12 @@ app.use(function (req, res, next) {
   const authorization = require("./src/middlewares/authorization.middleware");
   const table_router = require("./src/routes/table_router");
   const table_transaction_router = require("./src/routes/table_transaction_router");
-  app.use("/v1/token", authorization.get_token);
-  app.use("/v1/getUserMenu", authorization.get_user_menu);
+  app.get("/v1/token/user_id/:user_id/password/:password", authorization.get_token);
   app.use("/v1", authorization.authorize_token);
-
+  app.use("/v1/getUserMenu", authorization.get_user_menu);
   app.use("/v1/agency", table_router);
   app.use("/v1/transaction", table_transaction_router);
+
   app.use("*", function (req, res) {
     res.status(404).send({ status: "error", data: "Not Found!" });
   });

@@ -4,9 +4,9 @@ const express = require('express');
 const router = express.Router();
 
 
-router.get('/id/:id', async (req, res) => {
+router.get('/vehicle_id/:vehicle_id', async (req, res) => {
     try {
-        const data = await tl_vehicle.get(req, req.params.id);
+        const data = await tl_vehicle.get(req.app.get("db"), req.user_session, req.params.vehicle_id);
         reposne_utils.send_response(req, res, 200, data)
     } catch (err) {
         reposne_utils.send_response(req, res, 400, err)
@@ -26,7 +26,7 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
-        const data = await tl_vehicle.insert(req.app.get("db"), req.body);
+        const data = await tl_vehicle.insert(req.app.get("db"), req.user_session, req.body);
         return reposne_utils.send_response(req, res, 200, data)
     } catch (err) {
         return reposne_utils.send_response(req, res, 403, err)
@@ -34,9 +34,9 @@ router.post('/', async (req, res) => {
 });
 
 
-router.put('/id/:id', async (req, res) => {
+router.put('/vehicle_id/:vehicle_id', async (req, res) => {
     try {
-        const data = await tl_vehicle.update(req.app.get("db"), req.body);
+        const data = await tl_vehicle.update(req.app.get("db"), req.user_session, req.body, req.params.vehicle_id);
         return reposne_utils.send_response(req, res, 200, data);
     } catch (err) {
         return res.status(403).send(err);

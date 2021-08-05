@@ -1,35 +1,27 @@
 const db_fn = require('../configs/db.fn.config');
-const { schema, tl_audit_log } = require('../configs/db.schema.table.config').doc_db_config;
+const { schema, tl_transaction_audit_log } = require('../configs/db.schema.table.config').doc_db_config;
 const formValidation = require('../configs/before.validation').formValidation;
 const formRequiredField = require('../configs/table.model');
 const { getUserId, currentDate, action_flag_A, action_flag_M } = require('../utils/utils');
 
 const get = async (dbConnection, id) => {
-    const doc = await db_fn.get_one_from_db(dbConnection, schema, tl_audit_log, { id });
+    const doc = await db_fn.get_one_from_db(dbConnection, schema, tl_transaction_audit_log, { id });
     return doc;
 }
 
 const getAll = async (dbConnection) => {
-    const doc = await db_fn.get_all_from_db(dbConnection, schema, tl_audit_log, {});
+    const doc = await db_fn.get_all_from_db(dbConnection, schema, tl_transaction_audit_log, {});
     return doc;
 }
 
 
-const insert = async (dbConnection, body, tokenId) => {
+const insert = async (dbConnection, userSession, body) => {
     try {
-        await formValidation(formRequiredField.tl_audit_log("insert"), body);
+        // await formValidation(formRequiredField.tl_transaction_audit_log("insert"), body);
         let data = {
-            ...body,
-            action_flag: action_flag_A,
-            created_on: currentDate(),
-            modified_on: currentDate(),
-            modified_by: getUserId(tokenId).userId,
-            created_by: getUserId(tokenId).userId,
-            changes_done_on: currentDate(),
-            log_purges_on: currentDate(),
-            changes_done_by: getUserId(tokenId).userId
+            ...body
         }
-        return await db_fn.insert_records(dbConnection, schema, tl_audit_log, data);
+        return await db_fn.insert_records(dbConnection, schema, tl_transaction_audit_log, data);
     } catch (error) {
         throw error;
     }
@@ -83,12 +75,9 @@ const saveAll = async (dbConnection, body) => {
         throw error;
     }
 }
-
-module.exports = {
-    get,
-    getAll,
-    insert,
-    update,
-    saveAll,
-    deleteRecord
-}
+module.exports.get = get;
+module.exports.getAll = getAll;
+module.exports.insert = insert;
+module.exports.update = update;
+module.exports.saveAll = saveAll;
+module.exports.deleteRecord = deleteRecord;
