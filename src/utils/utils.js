@@ -85,7 +85,23 @@ const getUserId = (tokenId) => {
     }
 }
 
-const isActiveRoleAllowed = (userSession, id, group_id, active_role_id) => {
+const isActiveRoleAllowed = (userSession, group_id, active_role_id) => {
+    let id;
+    if (userSession.activeRole == 'CTR') {
+        id = 'contractor_id';
+    } else if (userSession.activeRole == 'TPA') {
+        id = 'transport_agent_id'
+    } else if (userSession.activeRole == 'WP') {
+        id = 'water_plant_id'
+    } else if (userSession.activeRole == 'SCTR') {
+        id = 'sub_contractor_id'
+    }
+    else if (userSession.activeRole == 'IND') {
+        id = 'industry_id'
+    }
+
+
+
     let group = Array.isArray(userSession[userSession.activeRole]) && userSession[userSession.activeRole].filter(data => data[id]).map(ob => ob[id] == active_role_id && ob.group_id.find((itms) => itms));
     if (group[0] != group_id) {
         throw "group id does not match";

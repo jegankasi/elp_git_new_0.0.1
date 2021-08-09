@@ -636,6 +636,7 @@ const tl_transport_mapping = (method) => [
     { "transaction_id": [field.required, field.varchar] },
     { "driver_id": [field.required, field.num, 1, 100] },
     { "delivery_boy_id": [field.required, field.num, 1, 50] },
+    { "product_id": [field.required, field.num, 1, 50] },
     { "vehicle_id": [field.required, field.num] },
 ];
 

@@ -5,22 +5,25 @@ const util = require("../utils/utils");
 
 
 const checkRoles = (roles, activeRole) => roles.filter((role) => role === activeRole);
-
 const authorize_token = async (req, res, next) => {
     const auth_token = req.headers['authorization'];
-    const activeRole = req.headers['activerole'];
+    const activeRole = req.headers['active_role'];
+    const activeGroupId = req.headers['group_id'];
+    const activeRoleId = req.headers['active_role_id'];
     try {
         const token = auth_token && auth_token.replace('Bearer ', '');
         if (!token) return res.status(401).send({ status: 'error', data: 'Unauthorized!' });
         if (!activeRole) return res.status(401).send({ status: 'error', data: 'please mentioned activerole in header!' });
         let data = jwt.verify(token, process.env.SECRET_JWT_KEY);
         let profileData = await tlUser.getProfile(req.app.get("db"), data.user_id);
-        req.user_session = { ...profileData['user_profile'], activeRole };
+        req.user_session = { ...profileData['user_profile'], activeRole, activeGroupId, activeRoleId };
         let active_role = checkRoles(req.user_session['roles'], activeRole);
         if (!active_role.length >= 1) {
             throw "please mentioned relavant activeRole"
         }
-        console.log("active_role---->", active_role[0]);
+        if (activeRole != 'ADMIN') {
+            util.isActiveRoleAllowed(req.user_session, activeGroupId, activeRoleId);
+        }
         next();
     } catch (err) {
         return res.status(401).send({ status: 'error', data: err });
