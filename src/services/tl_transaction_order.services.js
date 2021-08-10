@@ -8,9 +8,10 @@ const tl_product_service = require('../services/tl_products_inventory.services')
 const tl_transaction_order_quotation_service = require('../services/tl_transaction_order_quotation.services');
 const tl_transaction_audit_log_service = require('../services/tl_transaction_audit_log.services');
 const _ = require("underscore");
+const tl_transport_quotation_service = require('../services/tl_transport_quatation.services');
 
 
-const insertTransportQuotation = async (dbConnection, userSession, body, params) => {
+const insertTransportQuotation = async (dbConnection, userSession, body, params, query) => {
     try {
         if (!(userSession.activeRole == 'CTR' || userSession.activeRole == 'SCTR' || userSession.activeRole == 'ADMIN')) {
             throw "forbidden access";
@@ -20,54 +21,19 @@ const insertTransportQuotation = async (dbConnection, userSession, body, params)
             throw "transaction id is not valid";
         }
 
-        for (const data of body.quotation) {
-            if (!data.product_id) {
-                throw "product_id is required"
-            }
-            let product = await tl_product_service.getProduct(dbConnection, userSession, { product_id: data.product_id, group_id: params.group_id });
-            if (!product) {
-                throw `${data.product_id} is not exist`;
-            }
-            if (!data.quantity) {
-                throw "quantity is required"
-            }
-            if (!data.estimation_km) {
-                throw "estimation_km is required"
-            }
-
-            if (!data.vehicle_type) {
-                throw "vehicle_type is required"
-            }
+        if (userSession.activeRole == 'ADMIN') {
+            group_id = query.groupId;
+            role_id = query.roleId;
+            role = query.role;
+            await getGroupUser(dbConnection, role_id, group_id, role);
+        } else {
+            group_id = userSession.activeGroupId;
+            role_id = userSession.activeRoleId;
+            role = userSession.activeRole;
         }
-
-        //  userSession.activeRole == 'SCTR'? params.activeRoleId : 
-
-        // transaction_id	
-
-        // transport_quotation_id	
-
-        // quotation	
-
-        // contractor_id	
-
-        // sub_contractor_id	
-
-        // submitted_user_id	
-
-        // group_id
-
-        let data = {
-            // transaction_id: params.transaction_id,
-            // quotation: body.quotation,
-            // contractor_id:
-            // sub_contractor_id :
-            // created_on: currentDate(),
-            // modified_on: currentDate(),
-            // created_by: userSession.user_id,
-            // modified_by: userSession.user_id,
-        }
-        return data;
+        return await tl_transport_quotation_service.insert(dbConnection, userSession, body, { group_id, role_id, role }, params.transaction_id);
     } catch (err) {
+        console.log("err------>", err);
         throw err;
     }
 }
@@ -117,7 +83,7 @@ const getTransactionOrder = async (dbConnection, userSession, query) => {
 
 
 //role industry, admin
-const insert = async (dbConnection, userSession, body, headers) => {
+const insert = async (dbConnection, userSession, body, query) => {
     let group_id, industry_id, groupData;
     try {
         ////////////////////validation section started///////////////
@@ -126,24 +92,19 @@ const insert = async (dbConnection, userSession, body, headers) => {
         if (!(userSession.activeRole == 'IND' || userSession.activeRole == 'ADMIN')) {
             throw "forbidden access";
         }
-        if (userSession.activeRole === 'ADMIN') {
-            if (!body.industry_id) {
-                throw "industry_id should not be blank";
-            }
-            if (!body.group_id) {
-                throw "group_id should not be blank";
-            }
-            groupData = await get(dbConnection, userSession, { parent_id: body.group_id, user_type: "IND", type_of_user_id: body.industry_id });
-            if (!groupData) {
-                throw "groupid is not matched";
-            }
-            group_id = groupData.parent_id;
-            industry_id = groupData.type_of_user_id;
+
+        if (userSession.activeRole == 'ADMIN' && !(query.groupId && query.roleId)) {
+            throw "group id or role Id empty in query param";
         }
 
-        if (userSession.activeRole == 'IND') {
-            group_id = userSession.activeGroupId;
-            industry_id = userSession.activeRoleId;
+        if (userSession.activeRole == 'ADMIN') {
+            group_id = query.groupId;
+            role_id = query.roleId;
+
+            await getGroupUser(dbConnection, role_id, group_id, role);
+        } else {
+            group_id = userSession.groupId;
+            role_id = userSession.activeRoleId;
         }
 
 
@@ -183,11 +144,11 @@ const insert = async (dbConnection, userSession, body, headers) => {
             modified_on: currentDate(),
             created_by: userSession.user_id,
             modified_by: userSession.user_id,
-            industry_id: industry_id,
-            industry_status: body.status === "industry submitted" ? "industry submitted" : "Add To Cart",
+            industry_id: role_id,
+            industry_status: body.status == "industry submitted" ? "industry submitted" : "Add To Cart",
             previous_status: null,
-            current_status: body.status === "industry submitted" ? "industry submitted" : "Add To Cart",
-            next_status: body.status === "industry submitted" ? "contractor pending" : "industry pending",
+            current_status: body.status == "industry submitted" ? "industry submitted" : "Add To Cart",
+            next_status: body.status == "industry submitted" ? "contractor pending" : "industry pending",
             on_behalf_of_industry: userSession.activeRole == 'ADMIN' ? userSession.user_id : null,
         }
 
@@ -210,13 +171,13 @@ const insert = async (dbConnection, userSession, body, headers) => {
 const getTransactionId = async (dbConnection, transaction_id) => await db_fn.get_one_from_db(dbConnection, schema, tl_transaction_order, { transaction_id }, {});
 const getGroupUser = async (dbConnection, type_of_user_id, group_id) => await db_fn.get_one_from_db(dbConnection, schema, tl_group, { parent_id: group_id, type_of_user_id }).then(data => {
     if (!data) {
-        throw "role_id is not matched the group";
+        throw "roleId | groupId | role is not matched";
     }
     return true;
 })
 
 const update = async (dbConnection, userSession, body, params, query) => {
-    let group_id;
+    let group_id, role_id, role;
     try {
         /*********    validation started ********/
         if (!(userSession.activeRole == 'SCTR' || userSession.activeRole == 'CTR' || userSession.activeRole == 'TPA' || userSession.activeRole == 'WP' || userSession.activeRole == 'IND' || userSession.activeRole == 'ADMIN')) {
@@ -227,32 +188,42 @@ const update = async (dbConnection, userSession, body, params, query) => {
             throw "transaction id is not valid";
         }
 
-        if ((userSession.activeRole == 'ADMIN' && !["IND", "CTR", "SCTR", "TPA", "WP"].includes(body.onBehalfOfRole))) {
-            throw "onBehalfOfRole field is not matched or blank"
+        if ((userSession.activeRole == 'ADMIN' && !["IND", "CTR", "SCTR", "TPA", "WP"].includes(query.onBehalfOfRole))) {
+            throw "onBehalfOfRole field is not matched or blank, set in query param"
         }
-        if (userSession.activeGroupId == 'ADMIN' && !body.group_id) {
-            throw "group id is mandatory";
+
+        if (userSession.activeRole == 'ADMIN' && !(query.groupId && query.roleId)) {
+            throw "group id or role Id empty in query param";
         }
-        group_id = userSession.activeGroupId || body.group_id;
-        if ('IND' == userSession.activeRole || 'ADMIN' == userSession.activeRole && body.onBehalfOfRole == 'IND') {
-            let payLoad = await industryValidation(dbConnection, userSession, body, group_id);
-            return await commit(dbConnection, payLoad, userSession, body.status, params, "IND");
+        if (userSession.activeRole == 'ADMIN') {
+            group_id = query.groupId;
+            role_id = query.roleId;
+            role = query.onBehalfOfRole;
+            await getGroupUser(dbConnection, role_id, group_id, role);
+        } else {
+            group_id = userSession.groupId;
+            role_id = userSession.activeRoleId;
+            role = userSession.activeRole;
         }
-        else if ('CTR' == userSession.activeRole || 'ADMIN' == userSession.activeRole && body.onBehalfOfRole == 'CTR') {
-            let payLoad = await contractorValidation(dbConnection, userSession, body, group_id)
-            return await commit(dbConnection, payLoad, userSession, body.status, params, "CTR");
+        if (['IND', 'ADMIN'].includes(role)) {
+            let payLoad = await industryValidation(dbConnection, userSession, body, group_id, role_id);
+            return await commit(dbConnection, payLoad, userSession, body.status, params, role);
         }
-        else if ('WP' == userSession.activeRole || 'ADMIN' == userSession.activeRole && body.onBehalfOfRole == 'WP') {
-            let payLoad = await waterPlantValidation(userSession, body);
-            return await commit(dbConnection, payLoad, userSession, body.status, params, "WP");
+        else if (['CTR', 'ADMIN'].includes(role)) {
+            let payLoad = await contractorValidation(dbConnection, userSession, body, group_id, params)
+            return await commit(dbConnection, payLoad, userSession, body.status, params, role);
         }
-        else if ('TPA' == userSession.activeRole || 'ADMIN' == userSession.activeRole && body.onBehalfOfRole == 'TPA') {
+        else if (['WP', 'ADMIN'].includes(role)) {
+            let payLoad = await waterPlantValidation(userSession, body, params);
+            return await commit(dbConnection, payLoad, userSession, body.status, params, role);
+        }
+        else if (['TPA', 'ADMIN'].includes(role)) {
             let payLoad = await tpaValidation(userSession, body);
-            return await commit(dbConnection, payLoad, userSession, body.status, params, "TPA");
+            return await commit(dbConnection, payLoad, userSession, body.status, params, role);
         }
-        else if ('SCTR' == userSession.activeRole || 'ADMIN' == userSession.activeRole && body.onBehalfOfRole == 'SCTR') {
+        else if (['SCTR', 'ADMIN'].includes(role)) {
             let payLoad = await contractorValidation(dbConnection, userSession, body, group_id)
-            return await commit(dbConnection, payLoad, userSession, body.status, params, "SCTR");
+            return await commit(dbConnection, payLoad, userSession, body.status, params, role);
         }
         throw "no proceess for your input";
     } catch (error) {
@@ -263,7 +234,7 @@ const update = async (dbConnection, userSession, body, params, query) => {
 
 
 
-const industryValidation = async (dbConnection, userSession, body, group_id) => {
+const industryValidation = async (dbConnection, userSession, body, group_id, role_id) => {
     let payLoad = {};
     try {
         if (!['industry submitted', 'Add To Cart'].includes(body.status)) {
@@ -297,7 +268,7 @@ const industryValidation = async (dbConnection, userSession, body, group_id) => 
             modified_on: currentDate(),
             created_by: userSession.user_id,
             modified_by: userSession.user_id,
-            industry_id: userSession.activeRoleId || body.industry_id,
+            industry_id: role_id,
             industry_status: body.status == "industry submitted" ? "industry submitted" : "Add To Cart",
             previous_status: null,
             current_status: body.status == "industry submitted" ? "industry submitted" : "Add To Cart",
@@ -316,14 +287,11 @@ const industryValidation = async (dbConnection, userSession, body, group_id) => 
 
 
 
-const contractorValidation = async (dbConnection, userSession, body, group_id) => {
-    let payLoad;
+const contractorValidation = async (dbConnection, userSession, body, group_id, params) => {
+    let payLoad = {};
     try {
         if (!['contractor_submitted_product_approval', 'contractor_rejected_industry_submitted'].includes(body.status))
             throw "status is not matched";
-
-        await getGroupUser(dbConnection, body.contractor_id, params.group_id, "CTR");
-
         if (!body.products || !Array.isArray(body.products)) {
             throw "products is not collection data"
         }
@@ -345,7 +313,7 @@ const contractorValidation = async (dbConnection, userSession, body, group_id) =
             water_plant_status: body.status == 'contractor_submitted_product_approval' ? "water plant pending" : null,
             contractor_status: body.status,
             on_behalf_of_contractor: userSession.activeRole == 'ADMIN' ? userSession.user_id : null,
-            previous_status: order.current_status,
+            previous_status: "industry submitted",
             current_status: body.status,
             next_status: body.status == 'contractor_submitted_product_approval' ? "water plant pending" : null
         }
@@ -359,30 +327,34 @@ const contractorValidation = async (dbConnection, userSession, body, group_id) =
 
 
 
-const waterPlantValidation = async (userSession, body) => {
-    if (!['product_approval_approved', 'product_approval_rejected'].includes(status)) throw "status is not matched";
+const waterPlantValidation = async (userSession, body, params) => {
+    if (!['product_approval_approved', 'product_approval_rejected'].includes(body.status)) throw "status is not matched";
 
     if (body.status == 'product_approval_approved') {
-        if (!['Y', 'N'].includes(status))
+        if (!['Y', 'N'].includes(body.water_plant_own_transport))
             throw "water_plant_own_transport is not matched or blank";
     }
     let payLoad = {};
-    payLoad.data = {
-        transaction_id: params.transaction_id,
-        water_plant_status: body.status,
-        on_behalf_of_water_plant: userSession.activeRole == 'ADMIN' ? userSession.user_id : null,
-        previous_status: order.current_status,
-        current_status: body.status,
-        water_plant_own_transport: body.water_plant_own_transport,
+    try {
+        payLoad.data = {
+            transaction_id: params.transaction_id,
+            water_plant_status: body.status,
+            on_behalf_of_water_plant: userSession.activeRole == 'ADMIN' ? userSession.user_id : null,
+            previous_status: "contractor_submitted_product_approval",
+            current_status: body.status,
+            water_plant_own_transport: body.water_plant_own_transport,
 
+        }
+        if ("product_approval_approved" == body.status) {
+            payLoad.data.next_status = "Y" == body.water_plant_own_transport ? "waterplant_mapped_transport_agent" : "contractor_mapped_transport_agent";
+        }
+        else {
+            payLoad.data.next_status = "water_plant_rejected_status_informed_to_industry"
+        }
+        payLoad.criteria = {};
+    } catch (err) {
+        throw err;
     }
-    if ("product_approval_approved" == body.status) {
-        payLoad.data.next_status = "Y" == body.water_plant_own_transport ? "waterplant_mapped_transport_agent" : "contractor_mapped_transport_agent";
-    }
-    else {
-        payLoad.data.next_status = "water_plant_rejected_status_informed_to_industry"
-    }
-    payLoad.criteria = {};
     return payLoad;
 }
 

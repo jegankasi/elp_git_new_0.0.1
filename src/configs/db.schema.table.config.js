@@ -32,7 +32,8 @@ const doc_db_config = {
     tl_section_form_fields: "tl_section_form_fields",
     tl_products_inventory: "tl_products_inventory",
     tl_transaction_order_quotation: "tl_transaction_order_quotation",
-    tl_transport_mapping: "tl_transport_mapping"
+    tl_transport_mapping: "tl_transport_mapping",
+    tl_transaction_transport_quotation: "tl_transaction_transport_quotation"
 }
 
 module.exports = {

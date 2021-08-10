@@ -100,9 +100,7 @@ const isActiveRoleAllowed = (userSession, group_id, active_role_id) => {
         id = 'industry_id'
     }
 
-
-
-    let group = Array.isArray(userSession[userSession.activeRole]) && userSession[userSession.activeRole].filter(data => data[id]).map(ob => ob[id] == active_role_id && ob.group_id.find((itms) => itms));
+    let group = Array.isArray(userSession[userSession.activeRole]) && userSession[userSession.activeRole].filter(data => data[id] == active_role_id).map(ob => ob[id] == active_role_id && ob.group_id.find((itms) => itms));
     if (group[0] != group_id) {
         throw "group id does not match";
     }
