@@ -9,6 +9,7 @@ const cors = require('cors')
 const app = express();
 app.use(cors())
 app.use(express.static('public'));
+process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
 // app.use(fileUpload({
 //   createParentPath: true
