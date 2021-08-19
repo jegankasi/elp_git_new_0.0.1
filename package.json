@@ -17,7 +17,6 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-fileupload": "^1.1.7-alpha.4",
-    "hc2d": "git+https://gitlab.com/pasupunuri/hc2d.git",
     "jsonwebtoken": "^8.5.1",
     "jwt-encode": "^1.0.1",
     "massive": "^6.6.0",
