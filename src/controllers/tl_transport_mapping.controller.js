@@ -32,14 +32,15 @@ router.get('/delivery_boy/transport_agent_id/:transport_agent_id', async (req, r
     }
 });
 
-router.get('/transaction_id', async (req, res) => {
+router.get('/transport_agent_id/:transport_agent_id', async (req, res) => {
     try {
-        const data = await tl_transport_mapping.getTransactionId(req.app.get("db"), req.user_session, req.params.transaction_id);
+        const data = await tl_transport_mapping.get(req.app.get("db"), req.user_session, req.params.transport_agent_id);
         return reposne_utils.send_response(req, res, 200, data)
     } catch (err) {
         return reposne_utils.send_response(req, res, 403, err)
     }
 });
+
 
 router.post('/', async (req, res) => {
     try {
