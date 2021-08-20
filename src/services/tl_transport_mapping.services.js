@@ -42,6 +42,18 @@ const getAll = async (dbConnection, critera) => {
     return doc;
 }
 
+const get = async (dbConnection, userSession, transport_agent_id) => {
+    try {
+        const res = {};
+        res.deliveryBoy = await getDeliveryBoy(dbConnection, userSession, transport_agent_id);
+        res.driver = await getDriver(dbConnection, userSession, transport_agent_id);
+        res.vehicle = await getVehicle(dbConnection, userSession, transport_agent_id);
+        return res;
+    } catch (err) {
+        throw error;
+    }
+}
+
 
 const insert = async (dbConnection, userSession, body) => {
     try {
@@ -99,3 +111,4 @@ module.exports.getDriver = getDriver;
 module.exports.getVehicle = getVehicle;
 module.exports.insert = insert;
 module.exports.getTransactionId = getTransactionId;
+module.exports.get = get;
