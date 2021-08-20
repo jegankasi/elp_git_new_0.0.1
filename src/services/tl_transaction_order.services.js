@@ -103,9 +103,11 @@ const insert = async (dbConnection, userSession, body, query) => {
 
             await getGroupUser(dbConnection, role_id, group_id, role);
         } else {
-            group_id = userSession.groupId;
+            group_id = userSession.activeGroupId;
             role_id = userSession.activeRoleId;
         }
+
+
 
 
         if (!body.products || !Array.isArray(body.products)) {
@@ -201,7 +203,7 @@ const update = async (dbConnection, userSession, body, params, query) => {
             role = query.onBehalfOfRole;
             await getGroupUser(dbConnection, role_id, group_id, role);
         } else {
-            group_id = userSession.groupId;
+            group_id = userSession.activeGroupId;
             role_id = userSession.activeRoleId;
             role = userSession.activeRole;
         }
