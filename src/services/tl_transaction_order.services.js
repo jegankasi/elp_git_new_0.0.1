@@ -1,5 +1,5 @@
 const db_fn = require('../configs/db.fn.config');
-const { schema, tl_transaction_audit_log, tl_transaction_order, tl_transaction_order_quotation, tl_group } = require('../configs/db.schema.table.config').doc_db_config;
+const { schema, tl_transaction_order, tl_transaction_order_quotation, tl_group } = require('../configs/db.schema.table.config').doc_db_config;
 const formValidation = require('../configs/before.validation').formValidation;
 const { v1: uuidv1 } = require("uuid");
 const { getUserId, currentDate, action_flag_A, action_flag_M, isActiveRoleAllowed } = require('../utils/utils');
@@ -33,7 +33,6 @@ const insertTransportQuotation = async (dbConnection, userSession, body, params,
         }
         return await tl_transport_quotation_service.insert(dbConnection, userSession, body, { group_id, role_id, role }, params.transaction_id);
     } catch (err) {
-        console.log("err------>", err);
         throw err;
     }
 }
