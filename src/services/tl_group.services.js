@@ -17,6 +17,11 @@ const get = async (dbConnection, userSession, criteria) => {
     return doc;
 }
 
+const runQuery = async (dbConnection, userSession, query) => {
+    const doc = await db_fn.run_query(dbConnection, query);
+    return doc;
+}
+
 const getByGroupName = async (dbConnection, userSession, group_name) => {
     const doc = await db_fn.get_one_from_db(dbConnection, schema, tl_group, { group_name });
     return doc;
@@ -234,6 +239,7 @@ const groupOfUser = async (dbConnection, userSession, groupName) => {
     return await getAll(dbConnection, criteria, ['type_of_user_number', 'user_type']);
 }
 
+module.exports.runQuery = runQuery;
 module.exports.get = get;
 module.exports.getAll = getAll;
 module.exports.insert = insert;
