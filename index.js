@@ -12,7 +12,7 @@ app.use(express.static('public'));
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
 // app.use(fileUpload({
-//   createParentPath: true
+//   createParentPath: true    
 // }));//gets the file in the request
 
 app.use(function (req, res, next) {
@@ -28,13 +28,6 @@ app.use(function (req, res, next) {
 (async () => {
   const db = await massive(
     'postgres://tasgivscnohbpe:129b23998335b4a35d9839a2931718f3ef763031fbeb9f7a08ed3394415523c2@ec2-52-213-119-221.eu-west-1.compute.amazonaws.com:5432/d6b2bbinvsu58a??ssl=true&ssl=true'
-//     {
-//     host: process.env.HOST,
-//     port: process.env.DBPORT,
-//     database: process.env.DATABASE,
-//     user: process.env.USER,
-//     password: process.env.PASSWORD,
-//   }
   );
   app.set("db", db);
   app.use(bodyParser.json({ limit: '400mb', extended: true })); // parses application/json
@@ -55,16 +48,18 @@ app.use(function (req, res, next) {
   const table_router = require("./src/routes/table_router");
   const table_transaction_router = require("./src/routes/table_transaction_router");
   app.get("/v1/token/user_id/:user_id/password/:password", authorization.get_token);
+
   app.use("/v1", authorization.authorize_token);
   app.use("/v1/getUserMenu", authorization.get_user_menu);
+  app.use("/v1/getUserItemsByRole", authorization.getUserItemsByRole);
   app.use("/v1/agency", table_router);
   app.use("/v1/transaction", table_transaction_router);
 
   app.use("*", function (req, res) {
     res.status(404).send({ status: "error", data: "Not Found!" });
   });
-  const port = process.env.PORT || 80;
+  const port = process.env.PORT || 5000;
   app.listen(port, () => {
-    console.log("jab_service is running in port hi i am new: " + port);
+    console.log("jab_service is running in port: " + port);
   });
 })();
