@@ -86,7 +86,12 @@ const getUserId = (tokenId) => {
 }
 
 const isActiveRoleAllowed = (userSession, group_id, active_role_id) => {
+
+    if (!(group_id || active_role_id)) {
+        throw "group_id | active_role_id should be header";
+    }
     let id;
+
     if (userSession.activeRole == 'CTR') {
         id = 'contractor_id';
     } else if (userSession.activeRole == 'TPA') {
