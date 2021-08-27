@@ -73,24 +73,24 @@ const getUserItemsByRole = async (req, res) => {
             return res.status(500).send({ status: 'error', data: "user role does not match" });
         }
         if (activeRole == 'WP') {
-            return res.status(200).send({ status: 'success', data: { WP: req.user_session.WP, groups: await groupList(req, 'WP') } });
+            return res.status(200).send({ status: 'success', data: { WP: req.user_session.WP.map(data => ({ id: data.water_plant_id, name: data.plant_name, group_id: data.group_id })), groups: await groupList(req, 'WP') } });
         }
         if (activeRole == 'CTR') {
-            return res.status(200).send({ status: 'success', data: { CTR: req.user_session.CTR, groups: await groupList(req, 'CTR') } });
+            return res.status(200).send({ status: 'success', data: { CTR: req.user_session.CTR.map(data => ({ id: data.contractor_id, name: data.agency_name, group_id: data.group_id })), groups: await groupList(req, 'CTR') } });
         }
         if (activeRole == 'TPA') {
-            return res.status(200).send({ status: 'success', data: { TPA: req.user_session.TPA, groups: await groupList(req, 'TPA') } });
+            return res.status(200).send({ status: 'success', data: { TPA: req.user_session.TPA.map(data => ({ id: data.transport_agent_id, name: data.agency_name, group_id: data.group_id })), groups: await groupList(req, 'TPA') } });
         }
         if (activeRole == 'IND') {
-            return res.status(200).send({ status: 'success', data: { IND: req.user_session.IND, groups: await groupList(req, 'IND') } });
+            return res.status(200).send({ status: 'success', data: { IND: req.user_session.IND.map(data => ({ id: data.industry_id, name: data.industry_name, group_id: data.group_id })), groups: await groupList(req, 'IND') } });
         }
 
         if (activeRole == 'DR') {
-            return res.status(200).send({ status: 'success', data: { DR: req.user_session.DR, groups: await groupList(req, 'DR') } });
+            return res.status(200).send({ status: 'success', data: { DR: req.user_session.DR.map(data => ({ id: data.driver_id, name: data.driver_name, group_id: data.group_id })), groups: await groupList(req, 'DR') } });
         }
 
         if (activeRole == 'DB') {
-            return res.status(200).send({ status: 'success', data: { DB: req.user_session.DB, groups: await groupList(req, 'DB') } });
+            return res.status(200).send({ status: 'success', data: { DB: req.user_session.DB.map(data => ({ id: data.delivery_boy_id, name: data.deliveryboy_name, group_id: data.group_id })), groups: await groupList(req, 'DB') } });
         }
         return null;
 
