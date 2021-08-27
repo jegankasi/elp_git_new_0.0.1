@@ -161,7 +161,10 @@ const insert = async (dbConnection, userSession, body, query) => {
                 transactionQuatationAudit.push(trace);
             }
             await tl_transaction_audit_log_service.insert(tx, userSession, { transaction_id: tlTransactionOrder.transaction_id, object: { orderRequest: tlTransactionOrder, productDetails: transactionQuatationAudit }, userRole: "IND", created_by: industry_id, created_date: currentDate(), status: "industry submitted", on_behalf_of_user_id: userSession.activeRole === 'ADMIN' ? userSession.user_id : null });
-            return "success";
+            return {
+                transaction_id: tlTransactionOrder.transaction_id,
+                message: body.status == "industry submitted" ? `Product ordered Successfully` : "Products added your Basket"
+            };
         });
         return response;
     } catch (error) {
