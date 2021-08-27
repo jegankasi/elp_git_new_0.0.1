@@ -73,24 +73,24 @@ const getUserItemsByRole = async (req, res) => {
             return res.status(500).send({ status: 'error', data: "user role does not match" });
         }
         if (activeRole == 'WP') {
-            return res.status(200).send({ status: 'success', data: req.user_session.WP, groups: await groupList(req, 'WP') });
+            return res.status(200).send({ status: 'success', data: { WP: req.user_session.WP, groups: await groupList(req, 'WP') } });
         }
         if (activeRole == 'CTR') {
-            return res.status(200).send({ status: 'success', data: req.user_session.CTR, groups: await groupList(req, 'CTR') });
+            return res.status(200).send({ status: 'success', data: { CTR: req.user_session.CTR, groups: await groupList(req, 'CTR') } });
         }
         if (activeRole == 'TPA') {
-            return res.status(200).send({ status: 'success', data: req.user_session.TPA, groups: await groupList(req, 'TPA') });
+            return res.status(200).send({ status: 'success', data: { TPA: req.user_session.TPA, groups: await groupList(req, 'TPA') } });
         }
         if (activeRole == 'IND') {
-            return res.status(200).send({ status: 'success', data: req.user_session.IND, groups: await groupList(req, 'IND') });
+            return res.status(200).send({ status: 'success', data: { IND: req.user_session.IND, groups: await groupList(req, 'IND') } });
         }
 
         if (activeRole == 'DR') {
-            return res.status(200).send({ status: 'success', data: req.user_session.DR, groups: await groupList(req, 'DR') });
+            return res.status(200).send({ status: 'success', data: { DR: req.user_session.DR, groups: await groupList(req, 'DR') } });
         }
 
         if (activeRole == 'DB') {
-            return res.status(200).send({ status: 'success', data: req.user_session.DB, groups: await groupList(req, 'DB') });
+            return res.status(200).send({ status: 'success', data: { DB: req.user_session.DB, groups: await groupList(req, 'DB') } });
         }
         return null;
 
