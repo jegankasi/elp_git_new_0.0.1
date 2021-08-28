@@ -60,7 +60,7 @@ const getTransactionProducts = async (dbConnection, userSession, params) => {
 
 
 const getTransactionOrder = async (dbConnection, userSession, query) => {
-    let criteria;
+    let criteria = {};
     try {
         if (!(userSession.activeRole == 'CTR' || userSession.activeRole == 'TPA' || userSession.activeRole == 'WP' || userSession.activeRole == 'IND' || userSession.activeRole == 'ADMIN')) {
             throw "forbidden access";
@@ -69,12 +69,15 @@ const getTransactionOrder = async (dbConnection, userSession, query) => {
             if (_.isEmpty(query) || query.group_id == '') {
                 throw 'group_id should be sent in query param';
             }
-            criteria = { group_id: query.group_id }
+            criteria.group_id = query.group_id;
         } else {
-            criteria = { group_id: userSession.activeGroupId }
+            criteria.group_id = userSession.activeGroupId;
         }
+        query.status ? criteria.current_status = query.status : "";
+
         return await db_fn.get_all_from_db(dbConnection, schema, tl_transaction_order, criteria);
     } catch (err) {
+        console.log("err--->", err);
         throw err;
     }
 }
@@ -175,7 +178,7 @@ const insert = async (dbConnection, userSession, body, query) => {
 const getTransactionId = async (dbConnection, transaction_id) => await db_fn.get_one_from_db(dbConnection, schema, tl_transaction_order, { transaction_id }, {});
 const getGroupUser = async (dbConnection, type_of_user_id, group_id) => await db_fn.get_one_from_db(dbConnection, schema, tl_group, { parent_id: group_id, type_of_user_id }).then(data => {
     if (!data) {
-        throw "roleId | groupId | role is not matched";
+        throw "roleId | groupId |  is not matched";
     }
     return true;
 })
