@@ -77,7 +77,6 @@ const getTransactionOrder = async (dbConnection, userSession, query) => {
 
         return await db_fn.get_all_from_db(dbConnection, schema, tl_transaction_order, criteria);
     } catch (err) {
-        console.log("err--->", err);
         throw err;
     }
 }

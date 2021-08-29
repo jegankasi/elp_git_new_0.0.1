@@ -80,5 +80,15 @@ router.get('/group_name/:group_name', async (req, res) => {
     }
 });
 
+router.get('/getAllRoles', async (req, res) => {
+    try {
+        const data = await tl_group.getAllRoles(req.app.get("db"), req.user_session, req.params.group_name);
+        return reposne_utils.send_response(req, res, 200, data)
+    } catch (err) {
+        console.log("err--->", err);
+        return reposne_utils.send_response(req, res, 403, err)
+    }
+});
+
 
 module.exports = router;

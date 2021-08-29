@@ -27,7 +27,7 @@ app.use(function (req, res, next) {
 
 (async () => {
   const db = await massive(
-    'postgres://tasgivscnohbpe:129b23998335b4a35d9839a2931718f3ef763031fbeb9f7a08ed3394415523c2@ec2-52-213-119-221.eu-west-1.compute.amazonaws.com:5432/d6b2bbinvsu58a??ssl=true&ssl=true'
+    'postgres://tasgivscnohbpe:129b23998335b4a35d9839a2931718f3ef763031fbeb9f7a08ed3394415523c2@ec2-52-213-119-221.eu-west-1.compute.amazonaws.com:5432/d6b2bbinvsu58a?ssl=true'
   );
   app.set("db", db);
   app.use(bodyParser.json({ limit: '400mb', extended: true })); // parses application/json

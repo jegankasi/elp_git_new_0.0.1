@@ -12,6 +12,7 @@ const tl_transport_agent_service = require('../services/tl_transport_agent.servi
 const tl_driver_service = require('../services/tl_driver.services');
 const tl_delivery_boy_service = require('../services/tl_delivery_boy.services');
 
+
 const get = async (dbConnection, userSession, criteria) => {
     const doc = await db_fn.get_one_from_db(dbConnection, schema, tl_group, criteria);
     return doc;
@@ -239,6 +240,29 @@ const groupOfUser = async (dbConnection, userSession, groupName) => {
     return await getAll(dbConnection, criteria, ['type_of_user_number', 'user_type']);
 }
 
+const getAllRoles = async (dbConnection, userSession, groupName) => {
+    if (!(userSession.activeRole == 'CTR' || userSession.activeRole == 'ADMIN')) {
+        throw "forbidden access";
+    }
+    let response = {}, CTR = {}, SCTR = {}, IND = {}, TPA = {}, WP = {};
+
+    try {
+        CTR = await tl_contractor_service.getAll(dbConnection, userSession, {}, { "fields": ["contractor_id", "agency_name"] });
+        SCTR = await tl_sub_contractor_service.getAll(dbConnection, userSession, {}, { "fields": ["sub_contractor_id", "agency_name"] });
+        IND = await tl_industry_service.getAll(dbConnection, userSession, {}, { "fields": ["industry_id", "industry_name"] });
+        TPA = await tl_transport_agent_service.getAll(dbConnection, userSession, {}, { "fields": ["transport_agent_id", "agency_name"] });
+        WP = await tl_water_plant_service.getAll(dbConnection, userSession, {}, { "fields": ["water_plant_id", "plant_name"] });
+        response.CTR = CTR.reduce((obj, item) => Object.assign(obj, { [item.contractor_id]: item.agency_name }), {});
+        response.SCTR = SCTR.reduce((obj, item) => Object.assign(obj, { [item.sub_contractor_id]: item.agency_name }), {});
+        response.IND = IND.reduce((obj, item) => Object.assign(obj, { [item.industry_id]: item.industry_name }), {});
+        response.TPA = TPA.reduce((obj, item) => Object.assign(obj, { [item.transport_agent_id]: item.agency_name }), {});
+        response.WP = WP.reduce((obj, item) => Object.assign(obj, { [item.water_plant_id]: item.plant_name }), {});
+    } catch (err) {
+        throw err;
+    }
+    return response;
+}
+
 module.exports.runQuery = runQuery;
 module.exports.get = get;
 module.exports.getAll = getAll;
@@ -250,3 +274,4 @@ module.exports.insertTypeOfUser = insertTypeOfUser;
 module.exports.groupOfUser = groupOfUser;
 module.exports.getByUserType = getByUserType;
 module.exports.getTypeOfUserNumberByGroupId = getTypeOfUserNumberByGroupId;
+module.exports.getAllRoles = getAllRoles;
