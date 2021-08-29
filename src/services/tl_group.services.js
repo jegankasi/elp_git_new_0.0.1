@@ -252,12 +252,13 @@ const getAllRoles = async (dbConnection, userSession, groupName) => {
         IND = await tl_industry_service.getAll(dbConnection, userSession, {}, { "fields": ["industry_id", "industry_name"] });
         TPA = await tl_transport_agent_service.getAll(dbConnection, userSession, {}, { "fields": ["transport_agent_id", "agency_name"] });
         WP = await tl_water_plant_service.getAll(dbConnection, userSession, {}, { "fields": ["water_plant_id", "plant_name"] });
-        response.CTR = CTR.reduce((obj, item) => Object.assign(obj, { [item.contractor_id]: item.agency_name }), {});
-        response.SCTR = SCTR.reduce((obj, item) => Object.assign(obj, { [item.sub_contractor_id]: item.agency_name }), {});
-        response.IND = IND.reduce((obj, item) => Object.assign(obj, { [item.industry_id]: item.industry_name }), {});
-        response.TPA = TPA.reduce((obj, item) => Object.assign(obj, { [item.transport_agent_id]: item.agency_name }), {});
-        response.WP = WP.reduce((obj, item) => Object.assign(obj, { [item.water_plant_id]: item.plant_name }), {});
+        response.CTR = CTR.forEach(data => ({ id: data.contractor_id, name: data.agency_name }));
+        response.SCTR = SCTR.map(data => ({ id: data.sub_contractor_id, name: data.agency_name }));
+        response.IND = IND.map(data => ({ id: data.industry_id, name: data.industry_name }));
+        response.TPA = TPA.map(data => ({ id: data.transport_agent_id, name: data.agency_name }));
+        response.WP = WP.map(data => ({ id: data.water_plant_id, name: data.plant_name }));
     } catch (err) {
+        console.log("err-->", err);
         throw err;
     }
     return response;
