@@ -11,7 +11,8 @@ const get = async (dbConnection, userSession, group_id) => {
 }
 
 
-const getAll = async (dbConnection, criteria, fields) => {
+const getAll = async (dbConnection, userSession, criteria, fields) => {
+
     const doc = await db_fn.get_all_from_db(dbConnection, schema, tl_transaction_order_quotation, criteria, {
         fields,
         order: [

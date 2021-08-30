@@ -11,6 +11,18 @@ const _ = require("underscore");
 const tl_transport_quotation_service = require('../services/tl_transport_quatation.services');
 
 
+
+const compareProductsQuantity = (requestProduct, dbProduct) => {
+    const cumulativeProductQuantity = (product_id) => requestProduct.filter(data => data.product_id == product_id).reduce(((accumulator, currentValue) => accumulator + currentValue.quantity), 0);
+
+    dbProduct.map(data => {
+        if (cumulativeProductQuantity(data.product_id) != data.quantity) {
+            throw `${data.product_id} of quantity does not match with ordered prduct quantity`
+        }
+    });
+}
+
+
 const insertTransportQuotation = async (dbConnection, userSession, body, params, query) => {
     try {
         if (!(userSession.activeRole == 'CTR' || userSession.activeRole == 'SCTR' || userSession.activeRole == 'ADMIN')) {
@@ -21,6 +33,9 @@ const insertTransportQuotation = async (dbConnection, userSession, body, params,
             throw "transaction id is not valid";
         }
 
+
+        let products = await tl_transaction_order_quotation_service.getAll(dbConnection, userSession, { transaction_id: params.transaction_id }, ['transaction_id', 'product_id', 'contractor_rate', 'status', 'quantity', 'customer_rate', 'transaction_order_quotation_id', 'purchase_type']);
+        compareProductsQuantity(body.quotation, products);
         if (userSession.activeRole == 'ADMIN') {
             group_id = query.groupId;
             role_id = query.roleId;
@@ -33,6 +48,38 @@ const insertTransportQuotation = async (dbConnection, userSession, body, params,
         }
         return await tl_transport_quotation_service.insert(dbConnection, userSession, body, { group_id, role_id, role }, params.transaction_id);
     } catch (err) {
+        throw err;
+    }
+}
+
+
+const updateTransportQuotation = async (dbConnection, userSession, body, params, query) => {
+    try {
+        if (!(userSession.activeRole == 'CTR' || userSession.activeRole == 'SCTR' || userSession.activeRole == 'ADMIN')) {
+            throw "forbidden access";
+        }
+
+        if (_.isEmpty(await getTransactionId(dbConnection, params.transaction_id))) {
+            throw "transaction id is not valid";
+        }
+
+
+        let products = await tl_transaction_order_quotation_service.getAll(dbConnection, userSession, { transaction_id: params.transaction_id }, ['transaction_id', 'product_id', 'contractor_rate', 'status', 'quantity', 'customer_rate', 'transaction_order_quotation_id', 'purchase_type']);
+
+        console.log("products--->", products);
+        if (userSession.activeRole == 'ADMIN') {
+            group_id = query.groupId;
+            role_id = query.roleId;
+            role = query.role;
+            await getGroupUser(dbConnection, role_id, group_id, role);
+        } else {
+            group_id = userSession.activeGroupId;
+            role_id = userSession.activeRoleId;
+            role = userSession.activeRole;
+        }
+        return await tl_transport_quotation_service.insert(dbConnection, userSession, body, { group_id, role_id, role }, params.transaction_id);
+    } catch (err) {
+        console.log("err---->", err);
         throw err;
     }
 }
@@ -425,3 +472,4 @@ module.exports.getTransactionOrder = getTransactionOrder;
 module.exports.insert = insert;
 module.exports.update = update;
 module.exports.insertTransportQuotation = insertTransportQuotation;
+module.exports.updateTransportQuotation = updateTransportQuotation;

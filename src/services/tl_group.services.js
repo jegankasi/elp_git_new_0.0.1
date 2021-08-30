@@ -258,7 +258,6 @@ const getAllRoles = async (dbConnection, userSession, groupName) => {
         response.TPA = TPA.map(data => ({ id: data.transport_agent_id, name: data.agency_name }));
         response.WP = WP.map(data => ({ id: data.water_plant_id, name: data.plant_name }));
     } catch (err) {
-        console.log("err-->", err);
         throw err;
     }
     return response;

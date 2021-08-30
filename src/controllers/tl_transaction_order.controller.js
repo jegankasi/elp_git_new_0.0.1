@@ -39,9 +39,18 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.put('/transport_quotation/transaction_id/:transaction_id', async (req, res) => {
+router.post('/transport_quotation/transaction_id/:transaction_id', async (req, res) => {
     try {
         const data = await tl_transaction_order_service.insertTransportQuotation(req.app.get("db"), req.user_session, req.body, req.params, req.query);
+        return reposne_utils.send_response(req, res, 200, data)
+    } catch (err) {
+        return reposne_utils.send_response(req, res, 403, err)
+    }
+});
+
+router.put('/transport_quotation/transport_quotation_id/:transport_quotation_id/', async (req, res) => {
+    try {
+        const data = await tl_transaction_order_service.updateTransportQuotation(req.app.get("db"), req.user_session, req.body, req.params, req.query);
         return reposne_utils.send_response(req, res, 200, data)
     } catch (err) {
         return reposne_utils.send_response(req, res, 403, err)
