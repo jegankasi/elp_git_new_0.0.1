@@ -1,9 +1,11 @@
 const db_fn = require('../configs/db.fn.config');
-const { schema, tl_transaction_transport_quotation } = require('../configs/db.schema.table.config').doc_db_config;
+const { schema, tl_transaction_transport_quotation, tl_group, tl_transaction_order } = require('../configs/db.schema.table.config').doc_db_config;
 const formValidation = require('../configs/before.validation').formValidation;
 const formRequiredField = require('../configs/table.model');
 const { getUserId, currentDate, action_flag_A, action_flag_M, toJSDate } = require('../utils/utils');
 const tl_product_service = require('../services/tl_products_inventory.services');
+const tl_transaction_order_quotation_service = require('../services/tl_transaction_order_quotation.services');
+const _ = require("underscore");
 
 const getDeliveryBoy = async (dbConnection, userSession, transport_agent_id) => {
     try {
@@ -32,26 +34,53 @@ const getVehicle = async (dbConnection, userSession, transport_agent_id) => {
     }
 }
 
+const compareProductsQuantity = (requestProduct, dbProduct) => {
+    const cumulativeProductQuantity = (product_id) => requestProduct.filter(data => data.product_id == product_id).reduce(((accumulator, currentValue) => accumulator + currentValue.quantity), 0);
 
+    dbProduct.map(data => {
+        if (cumulativeProductQuantity(data.product_id) != data.quantity) {
+            throw `${data.product_id} of quantity does not match with ordered prduct quantity`
+        }
+    });
+}
 
-const insert = async (dbConnection, userSession, body, query, transaction_id) => {
+const getGroupUser = async (dbConnection, type_of_user_id, group_id) => await db_fn.get_one_from_db(dbConnection, schema, tl_group, { parent_id: group_id, type_of_user_id }).then(data => {
+    if (!data) {
+        throw "roleId | groupId |  is not matched";
+    }
+    return true;
+})
+
+const insert = async (dbConnection, userSession, body, query, params) => {
     try {
         let param = {};
+        if (!(userSession.activeRole == 'CTR' || userSession.activeRole == 'SCTR' || userSession.activeRole == 'ADMIN')) {
+            throw "forbidden access";
+        }
+
+        if (_.isEmpty(await getTransactionId(dbConnection, params.transaction_id))) {
+            throw "transaction id is not valid";
+        }
+
+        let products = await tl_transaction_order_quotation_service.getAll(dbConnection, userSession, { transaction_id: params.transaction_id }, ['transaction_id', 'product_id', 'contractor_rate', 'status', 'quantity', 'customer_rate', 'transaction_order_quotation_id', 'purchase_type']);
+        compareProductsQuantity(body.quotation, products);
+
+        if (userSession.activeRole == 'ADMIN') {
+            group_id = query.groupId;
+            role_id = query.roleId;
+            role = query.role;
+            await getGroupUser(dbConnection, role_id, group_id, role);
+        } else {
+            group_id = userSession.activeGroupId;
+            role_id = userSession.activeRoleId;
+            role = userSession.activeRole;
+        }
+
         if (!body.quotation || !Array.isArray(body.quotation)) {
             throw "quotation is collection records should be sent"
         }
 
         for (const data of body.quotation) {
-            if (!data.product_id) {
-                throw "product_id is required"
-            }
-            let product = await tl_product_service.getProduct(dbConnection, userSession, { product_id: data.product_id, group_id: query.group_id });
-            if (!product) {
-                throw `${data.product_id} is not exist`;
-            }
-            if (!data.quantity) {
-                throw "quantity is required"
-            }
             if (!data.estimation_km) {
                 throw "estimation_km is required"
             }
@@ -59,39 +88,70 @@ const insert = async (dbConnection, userSession, body, query, transaction_id) =>
                 throw "vehicle_type is required"
             }
         }
-        if (query.role == "CTR") {
-            param.contractor_id = query.role_id;
-        }
-        else if (query.role == "SCTR") {
-            param.sub_contractor_id = query.role_id;
-        }
+
+        param.contractor_id = role == "CTR" ? role_id : null;
+        param.sub_contractor_id = role == "SCTR" ? role_id : null;
         param.created_by = userSession.user_id;
         param.modified_by = userSession.user_id;
         param.created_on = currentDate();
         param.modified_on = currentDate();
-        param.transaction_id = transaction_id;
-
-        return await db_fn.insert_records(dbConnection, schema, tl_transaction_transport_quotation, { quotation: { quote: body.quotation }, group_id: query.group_id, ...param });
+        param.transaction_id = params.transaction_id;
+        param.quotation = { quote: body.quotation };
+        param.group_id = group_id;
+        return await db_fn.insert_records(dbConnection, schema, tl_transaction_transport_quotation, param);
     } catch (error) {
         throw error;
     }
 }
 
-const update = async (dbConnection, body, tokenId) => {
+const update = async (dbConnection, userSession, body, query, params) => {
     try {
-        await formValidation(formRequiredField.tl_user("update"), body);
-        let data = {
-            ...body,
-            action_flag: action_flag_M,
-            modified_on: currentDate(),
-            modified_by: getUserId(tokenId).userId,
-            dob: toJSDate(body.dob),
+        let data = {};
+        if (!(userSession.activeRole == 'CTR' || userSession.activeRole == 'SCTR' || userSession.activeRole == 'ADMIN')) {
+            throw "forbidden access";
         }
-        let criteria = {
-            id: body.id
+
+        if (_.isEmpty(await getTransactionId(dbConnection, params.transaction_id))) {
+            throw "transaction id is not valid";
         }
-        let records = await db_fn.update_records(dbConnection, schema, tl_transaction_transport_quotation, criteria, data);
-        return records[0];
+
+        let products = await tl_transaction_order_quotation_service.getAll(dbConnection, userSession, { transaction_id: params.transaction_id }, ['transaction_id', 'product_id', 'contractor_rate', 'status', 'quantity', 'customer_rate', 'transaction_order_quotation_id', 'purchase_type']);
+        compareProductsQuantity(body.quotation, products);
+
+        if (userSession.activeRole == 'ADMIN') {
+            group_id = query.groupId;
+            role_id = query.roleId;
+            role = query.role;
+            await getGroupUser(dbConnection, role_id, group_id, role);
+        } else {
+            group_id = userSession.activeGroupId;
+            role_id = userSession.activeRoleId;
+            role = userSession.activeRole;
+        }
+
+        if (!body.quotation || !Array.isArray(body.quotation)) {
+            throw "quotation is collection records should be sent"
+        }
+
+        for (const data of body.quotation) {
+            if (!data.estimation_km) {
+                throw "estimation_km is required"
+            }
+            if (!data.vehicle_type) {
+                throw "vehicle_type is required"
+            }
+        }
+
+        data.contractor_id = role == "CTR" ? role_id : null;
+        data.sub_contractor_id = role == "SCTR" ? role_id : null;
+        data.created_by = userSession.user_id;
+        data.modified_by = userSession.user_id;
+        data.created_on = currentDate();
+        data.modified_on = currentDate();
+        data.transaction_id = params.transaction_id;
+        data.quotation = { quote: body.quotation };
+        data.group_id = group_id;
+        return await db_fn.update_records(dbConnection, schema, tl_transaction_transport_quotation, { transaction_id: params.transaction_id, transport_quotation_id: params.transport_quotation_id }, data);
     } catch (error) {
         throw error;
     }
@@ -116,4 +176,5 @@ module.exports.getDeliveryBoy = getDeliveryBoy;
 module.exports.getDriver = getDriver;
 module.exports.getVehicle = getVehicle;
 module.exports.insert = insert;
+module.exports.update = update;
 module.exports.getTransactionId = getTransactionId;
