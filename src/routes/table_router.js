@@ -29,6 +29,7 @@ const tl_login = require('../controllers/tl_login.controller');
 const uploadFile = require('../controllers/file-upload/uploadFiles.controller');
 const tl_user_refernce = require('../controllers/tl_user_reference.controller');
 const tl_transport_mapping = require('../controllers/tl_transport_mapping.controller');
+const tl_trip = require('../controllers/tl_trip.controller');
 
 
 router.use('/tl_util', tl_util);
@@ -59,6 +60,7 @@ router.use('/uploadFile', uploadFile);
 router.use('/tl_user_reference', tl_user_refernce);
 router.use('/tl_transaction_order', tl_transaction_order);
 router.use('/tl_transport_mapping', tl_transport_mapping);
+router.use('/tl_trip', tl_trip);
 
 
 module.exports = router;

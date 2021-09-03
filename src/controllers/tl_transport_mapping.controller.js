@@ -42,9 +42,19 @@ router.get('/transport_agent_id/:transport_agent_id', async (req, res) => {
 });
 
 
-router.post('/', async (req, res) => {
+router.post('/transaction_id/:transaction_id', async (req, res) => {
     try {
-        const data = await tl_transport_mapping.insert(req.app.get("db"), req.user_session, req.body);
+        const data = await tl_transport_mapping.insert(req.app.get("db"), req.user_session, req.body, req.query, req.params);
+        return reposne_utils.send_response(req, res, 200, data)
+    } catch (err) {
+        return reposne_utils.send_response(req, res, 403, err)
+    }
+});
+
+
+router.put('/transaction_id/:transaction_id/transport_mapping_id/:transport_mapping_id', async (req, res) => {
+    try {
+        const data = await tl_transport_mapping.update(req.app.get("db"), req.user_session, req.body, req.query, req.params);
         return reposne_utils.send_response(req, res, 200, data)
     } catch (err) {
         return reposne_utils.send_response(req, res, 403, err)
