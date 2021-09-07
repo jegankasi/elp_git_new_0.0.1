@@ -125,6 +125,18 @@ const saveAll = async (dbConnection, body) => {
     }
 }
 
+const createProfile = async (dbConnection, body) => {
+    try {
+        if (!body.user_id) {
+            throw "user id should not be blank";
+        }
+        await db_fn.update_records(dbConnection, schema, tl_user, { user_id: body.user_id }, { profile_creation: 'Y' });
+        return 'success';
+    } catch (err) {
+        throw err;
+    }
+}
+
 
 module.exports.get = get;
 module.exports.getAll = getAll;
@@ -134,3 +146,4 @@ module.exports.saveAll = saveAll;
 module.exports.deleteRecord = deleteRecord;
 module.exports.updateProfile = updateProfile;
 module.exports.getProfile = getProfile;
+module.exports.createProfile = createProfile;

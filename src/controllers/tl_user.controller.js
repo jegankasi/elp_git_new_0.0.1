@@ -59,5 +59,14 @@ router.post('/saveAll', async (req, res) => {
     }
 });
 
+router.put('/user_id/:user_id', async (req, res) => {
+    try {
+        const data = await tl_user_service.createProfile(req.app.get("db"), req.params);
+        return reposne_utils.send_response(req, res, 200, data);
+    } catch (err) {
+        return res.status(403).send(err);
+    }
+});
+
 
 module.exports = router;
