@@ -271,24 +271,8 @@ const contractorValidation = async (dbConnection, userSession, body, group_id, p
     try {
         if (!['contractor_submitted_product_approval', 'contractor_rejected_industry_submitted'].includes(body.status))
             throw "status is not matched";
-        if (!body.products || !Array.isArray(body.products)) {
-            throw "products is not collection data"
-        }
-        for (const prd of body.products) {
-            if (!prd.product_id) {
-                throw "product_id is required";
-            }
-            let product = await tl_product_service.getProduct(dbConnection, userSession, { product_id: prd.product_id, group_id: group_id });
-            if (!product) {
-                throw `${prd.product_id} is not exist`;
-            }
-            if (!prd.contractor_rate) {
-                throw "contractor_rate is required"
-            }
-        }
         payLoad.data = {
             transaction_id: params.transaction_id,
-            products: body.status == 'contractor_submitted_product_approval' ? body.products : null,
             water_plant_status: body.status == 'contractor_submitted_product_approval' ? "water plant pending" : null,
             contractor_status: body.status,
             on_behalf_of_contractor: userSession.activeRole == 'ADMIN' ? userSession.user_id : null,
