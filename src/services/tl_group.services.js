@@ -48,34 +48,69 @@ const getTypeOfUserNumberByGroupId = async (dbConnection, group_id) => {
     return doc;
 }
 
-
-const insert = async (dbConnection, userSession, body) => {
-    await formValidation(formRequiredField.tl_group("insert"), body);
-    let data = {
-        ...body,
-        action_flag: action_flag_A,
-        created_on: currentDate(),
-        modified_on: currentDate(),
-        modified_by: userSession.user_id,
-        created_by: userSession.user_id,
-        parent_id: 0,
-        user_type: "G",
-
+const new_insert_id = async (dbConnection, user_type) => {
+    try {
+        const query = `select max(type_of_user_id) from ${schema}.${tl_group} where user_type = '${user_type}'`;
+        let max_id = await db_fn.run_query(dbConnection, query);
+        return max_id[0].max + 1;
+    } catch (err) {
+        throw err;
     }
-    delete data.group_id;
-    delete data.group_number;
-    return await db_fn.insert_records(dbConnection, schema, tl_group, data);
 }
 
-const isExistGroupId = async (dbConnection, group_id) => {
+
+const insertGroup = async (dbConnection, userSession, body) => {
     try {
-        let criteria = {
-            group_id
+        await formValidation(formRequiredField.tl_group("insert"), body);
+        let data = {
+            group_name: body.group_name,
+            description: body.description,
+            action_flag: action_flag_A,
+            created_on: currentDate(),
+            modified_on: currentDate(),
+            modified_by: userSession.user_id,
+            created_by: userSession.user_id,
+            parent_id: 0,
+            user_type: "G",
+            type_of_user_id: await new_insert_id(dbConnection, 'G')
         }
+        delete data.group_id;
+        return await db_fn.insert_records(dbConnection, schema, tl_group, data);
+    } catch (err) {
+        throw err;
+    }
+}
+
+const insert = async (dbConnection, userSession, body) => {
+    let data;
+    try {
+        if (!Array.isArray(body.groupMembers)) {
+            throw "it is not array of object";
+        }
+
+        if (await isExistGroupId(dbConnection, { group_name: body.group_name })) {
+            throw "group name is already exist";
+        }
+        data = await dbConnection.withTransaction(async tx => {
+            let group = await insertGroup(tx, userSession, body);
+            body.groupMembers.forEach(async ob => {
+                await insertTypeOfUser(tx, userSession, {
+                    group_id: group.group_id,
+                    type_of_user_id: ob.id,
+                    user_type: ob.category
+                });
+            })
+            return "success";
+        });
+    } catch (err) {
+        throw err;
+    }
+    return data;
+}
+
+const isExistGroupId = async (dbConnection, criteria) => {
+    try {
         let isExist = await db_fn.get_one_from_db(dbConnection, schema, tl_group, criteria);
-        if (!isExist) {
-            throw "group_id not exist";
-        }
         return isExist;
     } catch (error) {
         throw error;
@@ -164,7 +199,7 @@ const isExistTypeOfUser = async (dbConnection, type_of_user_id, userSession, use
 const insertTypeOfUser = async (dbConnection, userSession, params) => {
     let { group_id, type_of_user_id, user_type } = params;
     try {
-        await isExistGroupId(dbConnection, group_id);
+        // await isExistGroupId(dbConnection, group_id);
         await isExistTypeOfUser(dbConnection, type_of_user_id, userSession, user_type);
 
         let data = {
@@ -235,9 +270,42 @@ const saveAll = async (dbConnection, body) => {
 }
 
 const groupOfUser = async (dbConnection, userSession, groupName) => {
-    const response = await getByGroupName(dbConnection, userSession, groupName);
-    let criteria = { parent_id: response.group_id };
-    return await getAll(dbConnection, criteria, ['type_of_user_number', 'user_type']);
+    try {
+        const response = await getByGroupName(dbConnection, userSession, groupName);
+        if (!response) {
+            return "data is not exist"
+        }
+        let criteria = { parent_id: response.group_id };
+        let data = await getAll(dbConnection, userSession, criteria, ['type_of_user_id', 'user_type']);
+        //return data;
+        const result = [];
+        for (const element of data) {
+            const rs = {};
+            if (element.user_type == 'CTR') {
+                rs.user_type = 'CTR';
+                rs.user = await tl_contractor_service.get(dbConnection, userSession, element.type_of_user_id);
+                result.push(rs);
+            }
+            if (element.user_type == 'IND') {
+                rs.user_type = 'IND';
+                rs.user = await tl_industry_service.get(dbConnection, userSession, element.type_of_user_id);
+                result.push(rs);
+            }
+            if (element.user_type == 'WP') {
+                rs.user_type = 'WP';
+                rs.user = await tl_water_plant_service.get(dbConnection, userSession, element.type_of_user_id);
+                result.push(rs);
+            }
+            if (element.user_type == 'TPA') {
+                rs.user_type = 'TPA';
+                rs.user = await tl_water_plant_service.get(dbConnection, userSession, element.type_of_user_id);
+                result.push(rs);
+            }
+        }
+        return result;
+    } catch (err) {
+        throw err;
+    }
 }
 
 const getAllRoles = async (dbConnection, userSession, groupName) => {
