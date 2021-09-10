@@ -12,7 +12,7 @@ const compareProductsQuantity = (requestProduct, dbProduct) => {
     const cumulativeProductQuantity = (product_id) => requestProduct.filter(data => data.product_id == product_id).reduce(((accumulator, currentValue) => accumulator + currentValue.quantity), 0);
     dbProduct.map(data => {
         if (cumulativeProductQuantity(data.product_id) != data.quantity) {
-            throw `${data.product_id} of quantity does not match with ordered prduct quantity`
+            throw `${data.product_id}| of quantity does not match with ordered prduct quantity`
         }
     });
 }
@@ -48,11 +48,11 @@ const insert = async (dbConnection, userSession, body, query, params) => {
             let tripItem = tripSheetId.filter(data => data.transaction_id == params.transaction_id && data.product_id == item.product_id && data.transport_mapping_id == item.transport_mapping_id);
             if (!_.isEmpty(tripItem)) {
                 if (!item.tripsheet_id) {
-                    throw `please add attribute tripsheet_id for ${item.product_id}`;
+                    throw `${item.product_id}| please add attribute tripsheet_id`;
                 }
                 let tripId = tripItem.filter(data => data.tripsheet_id == item.tripsheet_id);
                 if (_.isEmpty(tripId)) {
-                    throw `please add respective tripsheet_id for ${item.product_id}`;
+                    throw `${item.product_id}| please add respective tripsheet_id`;
                 }
                 await db_fn.update_records(dbConnection, schema, tl_trip_sheet, { tripsheet_id: item.tripsheet_id, transaction_id: params.transaction_id }, item);
             } else {
