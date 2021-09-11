@@ -57,4 +57,14 @@ router.put('/transport_quotation/transaction_id/:transaction_id/transport_quotat
         return reposne_utils.send_response(req, res, 403, err)
     }
 });
+
+router.get('/transport_quotation/transaction_id/:transaction_id', async (req, res) => {
+    try {
+        const data = await tl_transport_quatation_service.get(req.app.get("db"), req.user_session, req.params);
+        return reposne_utils.send_response(req, res, 200, data)
+    } catch (err) {
+        return reposne_utils.send_response(req, res, 403, err)
+    }
+});
+
 module.exports = router;

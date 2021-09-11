@@ -167,6 +167,27 @@ const getTransactionId = async (dbConnection, userSession) => {
     }
 }
 
+const get = async (dbConnection, userSession, params) => {
+    try {
+        let records = await db_fn.get_one_from_db(dbConnection, schema, tl_transaction_transport_quotation, { transaction_id: params.transaction_id });
+        const quotation = [];
+        for (const data of records.quotation.quote) {
+            const prod = {};
+            prod.product = await tl_product_service.getProduct(dbConnection, userSession, { product_id: data.product_id });
+            prod.vehicle_price_per_km = data.vehicle_price_per_km;
+            prod.vehicle_type = data.vehicle_type;
+            prod.quantity = data.quantity;
+            prod.estimation_km = data.estimation_km;
+            quotation.push(prod);
+        }
+
+        return quotation;
+    } catch (err) {
+        console.log("err-----", err);
+        throw err;
+    }
+}
+
 
 
 
@@ -177,4 +198,5 @@ module.exports.getDriver = getDriver;
 module.exports.getVehicle = getVehicle;
 module.exports.insert = insert;
 module.exports.update = update;
+module.exports.get = get;
 module.exports.getTransactionId = getTransactionId;
