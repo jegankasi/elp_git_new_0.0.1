@@ -183,7 +183,6 @@ const get = async (dbConnection, userSession, params) => {
 
         return quotation;
     } catch (err) {
-        console.log("err-----", err);
         throw err;
     }
 }

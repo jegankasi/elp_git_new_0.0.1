@@ -5,8 +5,17 @@ const router = express.Router();
 
 router.get('/group_id/:group_id', async (req, res) => {
     try {
-        const data = await tl_group.get(req, req.user_session, req.params.group_id);
-        return reposne_utils.send_response(req.app.get('db'), res, 200, data)
+        const data = await tl_group.get(req.app.get('db'), req.user_session, req.params.group_id);
+        return reposne_utils.send_response(req, res, 200, data)
+    } catch (err) {
+        return reposne_utils.send_response(req, res, 400, err)
+    }
+});
+
+router.get('/groups', async (req, res) => {
+    try {
+        const data = await tl_group.getGroups(req.app.get('db'), req.user_session);
+        return reposne_utils.send_response(req, res, 200, data)
     } catch (err) {
         return reposne_utils.send_response(req, res, 400, err)
     }

@@ -18,6 +18,16 @@ const get = async (dbConnection, userSession, criteria) => {
     return doc;
 }
 
+const getGroups = async (dbConnection, userSession) => {
+    try {
+        const doc = await db_fn.get_all_from_db(dbConnection, schema, tl_group, { user_type: 'G' }, { fields: ['group_id', 'group_name'] });
+        return doc;
+    } catch (err) {
+        console.log(err);
+        throw err;
+    }
+}
+
 const runQuery = async (dbConnection, userSession, query) => {
     const doc = await db_fn.run_query(dbConnection, query);
     return doc;
@@ -333,6 +343,7 @@ const getAllRoles = async (dbConnection, userSession, groupName) => {
 
 module.exports.runQuery = runQuery;
 module.exports.get = get;
+module.exports.getGroups = getGroups;
 module.exports.getAll = getAll;
 module.exports.insert = insert;
 module.exports.update = update;

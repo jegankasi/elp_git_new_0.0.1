@@ -65,6 +65,8 @@ const userProfile = async (dbConnection, user_id, roles) => {
             }
         }
     }
+
+    console.log("user_profile_List---->", user_profile_List);
     return user_profile_List;
 }
 
