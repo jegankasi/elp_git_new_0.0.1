@@ -368,7 +368,7 @@ const tl_sub_contractor = (method) => [
     { "id": [method === 'update' ? field.required : field.noRequired, field.num] },
     { "group_id": [field.noRequired, field.num, 1, 50] },
     { "user_id": [field.required, field.num, 1, 50] },
-    { "contractor_id": [field.required, field.num, 1, 50] },
+    //{ "contractor_id": [field.required, field.num, 1, 50] },
     { "agency_name": [field.required, field.varchar, 1, 50] },
     { "agency_address": [field.required, field.varchar, 1, 250] },
     { "agency_phone": [field.required, field.varchar, 1, 20] },
@@ -424,7 +424,7 @@ const tl_driver = (method) => [
     { "id": [method === 'update' ? field.required : field.noRequired, field.num] },
     { "group_id": [field.noRequired, field.num, 1, 50] },
     { "user_id": [field.required, field.num, 1, 50] },
-    { "transport_agent_id": [field.required, field.num, 1, 50] },
+    //{ "transport_agent_id": [field.required, field.num, 1, 50] },
     { "driver_name": [field.required, field.varchar, 1, 50] },
     { "years_of_exp": [field.required, field.num] },
     { "driving_skills": [field.required, field.varchar, 1, 50] },
@@ -455,7 +455,7 @@ const tl_driver = (method) => [
 ];
 
 const tl_delivery_boy = (method) => [
-    { "transport_agent_id": [field.required, field.num, 1, 50] },
+    // { "transport_agent_id": [field.required, field.num, 1, 50] },
     { "deliveryboy_name": [field.required, field.varchar, 1, 50] },
     { "deliveryboy_address": [field.required, field.varchar, 1, 250] },
     { "deliveryboy_phone": [field.required, field.varchar, 1, 20] },
@@ -483,7 +483,7 @@ const tl_delivery_boy = (method) => [
 
 const tl_vehicle = (method) => [
     { "user_id": [field.required, field.num, 1, 50] },
-    { "transport_agent_id": [field.required, field.num, 1, 50] },
+    // { "transport_agent_id": [field.required, field.num, 1, 50] },
     { "driver_id": [field.required, field.num] },
     { "vehicle_reg_no": [field.required, field.varchar, 1, 50] },
     { "owner_name": [field.required, field.varchar, 1, 50] },
