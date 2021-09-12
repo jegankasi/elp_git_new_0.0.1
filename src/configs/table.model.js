@@ -484,7 +484,7 @@ const tl_delivery_boy = (method) => [
 const tl_vehicle = (method) => [
     { "user_id": [field.required, field.num, 1, 50] },
     // { "transport_agent_id": [field.required, field.num, 1, 50] },
-    { "driver_id": [field.required, field.num] },
+    //{ "driver_id": [field.required, field.num] },
     { "vehicle_reg_no": [field.required, field.varchar, 1, 50] },
     { "owner_name": [field.required, field.varchar, 1, 50] },
     { "owner_address": [field.required, field.varchar, 1, 250] },
@@ -503,7 +503,7 @@ const tl_vehicle = (method) => [
     { "gps_enabled": [field.required, field.varchar, 1, 1] },
     { "fasttag_id": [field.required, field.varchar, 1, 50] },
     { "kms_per_litre": [field.required, field.num] },
-    { "vehicle_capacity": [field.required, field.varchar] },
+    { "vehicle_capacity": [field.required, field.num] },
     { "vehicle_type": [field.required, field.varchar, 1, 50] },
     { "available_on_mon_fri": [field.required, field.varchar, 1, 50] },
     { "available_on_sat": [field.required, field.varchar, 1, 50] },
