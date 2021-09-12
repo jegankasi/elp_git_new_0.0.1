@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.get('/transaction_id/:transaction_id', async (req, res) => {
     try {
-        const data = await tl_tripsheet.get(req.app.get("db"), req.user_session, req.params.transport_agent_id);
+        const data = await tl_tripsheet.get(req.app.get("db"), req.user_session, req.params);
         return reposne_utils.send_response(req, res, 200, data)
     } catch (err) {
         return reposne_utils.send_response(req, res, 403, err)
