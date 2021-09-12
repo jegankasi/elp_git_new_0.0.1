@@ -13,8 +13,8 @@ const tl_driver_service = require('../services/tl_driver.services');
 const tl_delivery_boy_service = require('../services/tl_delivery_boy.services');
 
 
-const get = async (dbConnection, userSession, criteria) => {
-    const doc = await db_fn.get_one_from_db(dbConnection, schema, tl_group, criteria);
+const get = async (dbConnection, userSession, group_id) => {
+    const doc = await db_fn.get_all_from_db(dbConnection, schema, tl_group, { parent_id: group_id });
     return doc;
 }
 

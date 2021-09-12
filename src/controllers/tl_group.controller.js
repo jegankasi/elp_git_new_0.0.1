@@ -8,6 +8,7 @@ router.get('/group_id/:group_id', async (req, res) => {
         const data = await tl_group.get(req.app.get('db'), req.user_session, req.params.group_id);
         return reposne_utils.send_response(req, res, 200, data)
     } catch (err) {
+        console.log("err--->", err);
         return reposne_utils.send_response(req, res, 400, err)
     }
 });
