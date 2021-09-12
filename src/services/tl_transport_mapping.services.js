@@ -33,6 +33,14 @@ const getVehicle = async (dbConnection, userSession, transport_agent_id) => {
     }
 }
 
+const getTransportMappingDetails = async (dbConnection, userSession, transaction_id) => {
+    try {
+        return await db_fn.get_all_from_db(dbConnection, schema, tl_transport_mapping, { transaction_id });
+    } catch (err) {
+        throw err;
+    }
+}
+
 
 const get = async (dbConnection, userSession, transport_agent_id) => {
     try {
@@ -129,3 +137,4 @@ module.exports.insert = insert;
 module.exports.getTransactionId = getTransactionId;
 module.exports.get = get;
 module.exports.update = update;
+module.exports.getTransportMappingDetails = getTransportMappingDetails;

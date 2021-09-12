@@ -41,6 +41,15 @@ router.get('/transport_agent_id/:transport_agent_id', async (req, res) => {
     }
 });
 
+router.get('/transaction_id/:transaction_id', async (req, res) => {
+    try {
+        const data = await tl_transport_mapping.getTransportMappingDetails(req.app.get("db"), req.user_session, req.params.transaction_id);
+        return reposne_utils.send_response(req, res, 200, data)
+    } catch (err) {
+        return reposne_utils.send_response(req, res, 403, err)
+    }
+});
+
 
 router.post('/transaction_id/:transaction_id', async (req, res) => {
     try {
