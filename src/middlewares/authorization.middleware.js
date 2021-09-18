@@ -62,8 +62,12 @@ const get_user_menu = async (req, res, next) => {
 const reducer = (accumulator, currentValue) => accumulator.concat(currentValue);
 
 const groupList = async (req, role) => {
-    let collectGroupId = req.user_session[role].map(data => data.group_id).reduce(reducer).filter((v, i, a) => a.indexOf(v) === i);
-    return Array.isArray(collectGroupId) && collectGroupId.length >= 1 ? await tl_group_service.runQuery(req.app.get("db"), req.user_session, `select group_id, group_name from ${schema}.${tl_group} where group_id in (${collectGroupId.toString()})`) : [];
+    try {
+        let collectGroupId = req.user_session[role].map(data => data.group_id).reduce(reducer).filter((v, i, a) => a.indexOf(v) === i);
+        return Array.isArray(collectGroupId) && collectGroupId.length >= 1 ? await tl_group_service.runQuery(req.app.get("db"), req.user_session, `select group_id, group_name from ${schema}.${tl_group} where group_id in (${collectGroupId.toString()})`) : [];
+    } catch (err) {
+        throw err;
+    }
 }
 
 const getUserItemsByRole = async (req, res) => {

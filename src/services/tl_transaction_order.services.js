@@ -19,7 +19,7 @@ const getTransactionProducts = async (dbConnection, userSession, params) => {
         if (_.isEmpty(await getTransactionId(dbConnection, params.transaction_id))) {
             throw "transaction id is not valid";
         }
-        let productQuotation = await tl_transaction_order_quotation_service.getAll(dbConnection, { transaction_id: params.transaction_id });
+        let productQuotation = await tl_transaction_order_quotation_service.getAll(dbConnection, userSession, { transaction_id: params.transaction_id });
         for (const pQtn of productQuotation) {
             pQtn.product = await tl_product_service.getProduct(dbConnection, userSession, { product_id: pQtn.product_id });
             delete pQtn.product_id;
