@@ -1,6 +1,6 @@
 const db_fn = require('../configs/db.fn.config');
 const schema_table = require('../configs/db.schema.table.config').doc_db_config;
-const { schema, tl_profile, tl_user, tl_user_roles, tl_profile_function, tl_function, tl_cache } = schema_table;
+const { schema, tl_group, tl_user, tl_user_roles, tl_profile_function, tl_function, tl_cache } = schema_table;
 const { getUserId, currentDate, action_flag_A, action_flag_M } = require('../utils/utils');
 const formRequiredField = require('../configs/table.model');
 const formValidation = require('../configs/before.validation').formValidation;
@@ -70,14 +70,29 @@ const userProfile = async (dbConnection, user_id, roles) => {
     return user_profile_List;
 }
 
-const getUserRoleOfGroup = async (dbConnection, user_id, service, fields, user_type) => {
-    let group = [];
-    let userRoles = await service.getAll(dbConnection, "", { user_id }, { fields });
-    for (const role of userRoles) {
-        let groupId = await tl_group_service.getAll(dbConnection, "", { type_of_user_id: role[fields[0]], user_type }, ['parent_id']);
-        group.push({ [fields[0]]: role[fields[0]], [fields[1]]: role[fields[1]], group_id: groupId.map(item => item.parent_id) });
+const getUserRoleOfGroup = async (dbConnection, user) => {
+    let groupList = [];
+    const userRoles = async (service, fields, user_type) => {
+        const group = [];
+        for (const role of await service.getAll(dbConnection, "", { user_id: user.user_id }, { fields })) {
+            let groups = await tl_group_service.getAll(dbConnection, "", { type_of_user_id: role[fields[0]], user_type }, ['parent_id']);
+            group.push({ [fields[0]]: role[fields[0]], [fields[1]]: role[fields[1]], group_id: groups.map(item => item.parent_id) });
+            groupList.push([groups.map(item => item.parent_id), ...groupList]);
+        }
+        return group;
     }
-    return group;
+    user.WP = await userRoles(tl_water_plant_service, ['water_plant_id', 'plant_name'], 'WP');
+    user.IND = await userRoles(tl_industry_service, ["industry_id", 'industry_name'], "IND");
+    user.CTR = await userRoles(tl_contractor_service, ["contractor_id", "agency_name"], "CTR");
+    user.DB = await userRoles(tl_delivery_boy_service, ["delivery_boy_id", "deliveryboy_name"], "DB");
+    user.DR = await userRoles(tl_driver_service, ["driver_id", "driver_name"], "DR");
+    user.SCTR = await userRoles(tl_sub_contractor_service, ["sub_contractor_id", "agency_name"], "SCTR");
+    user.TPA = await userRoles(tl_transport_agent_service, ["transport_agent_id", "agency_name"], "TPA");
+    user.VEH = await userRoles(tl_vehicle_service, ["vehicle_id", 'vehicle_reg_no'], "VEH");
+
+
+    user.groupList = Array.isArray(groupList) && groupList.length >= 1 ? await tl_group_service.runQuery(dbConnection, null, `select group_id, group_name from ${schema}.${tl_group} where group_id in (${groupList.toString()})`) : [];
+    return user;
 }
 
 
@@ -98,14 +113,7 @@ const authCheck = async (dbConnection, body) => {
             user.country_code = tlUser.country_code;
             user.roles = [];
             await userProfile(dbConnection, tlUser.user_id, user.roles);
-            user.WP = await getUserRoleOfGroup(dbConnection, tlUser.user_id, tl_water_plant_service, ['water_plant_id', 'plant_name'], 'WP');
-            user.IND = await getUserRoleOfGroup(dbConnection, tlUser.user_id, tl_industry_service, ["industry_id", 'industry_name'], "IND");
-            user.CTR = await getUserRoleOfGroup(dbConnection, tlUser.user_id, tl_contractor_service, ["contractor_id", "agency_name"], "CTR");
-            user.DB = await getUserRoleOfGroup(dbConnection, tlUser.user_id, tl_delivery_boy_service, ["delivery_boy_id", "deliveryboy_name"], "DB");
-            user.DR = await getUserRoleOfGroup(dbConnection, tlUser.user_id, tl_driver_service, ["driver_id", "driver_name"], "DR");
-            user.SCTR = await getUserRoleOfGroup(dbConnection, tlUser.user_id, tl_sub_contractor_service, ["sub_contractor_id", "agency_name"], "SCTR");
-            user.TPA = await getUserRoleOfGroup(dbConnection, tlUser.user_id, tl_transport_agent_service, ["transport_agent_id", "agency_name"], "TPA");
-            user.VEH = await getUserRoleOfGroup(dbConnection, tlUser.user_id, tl_vehicle_service, ["vehicle_id", 'vehicle_reg_no'], "VEH");
+            await getUserRoleOfGroup(dbConnection, user);
             await tl_user_service.updateProfile(dbConnection, user, user.user_id);
         } else {
             return null;
@@ -116,7 +124,8 @@ const authCheck = async (dbConnection, body) => {
             user_id: user.user_id,
             gender: user.gender,
             country: user.country_code,
-            roles: user.roles
+            roles: user.roles,
+            ...user
         };
     } catch (err) {
         throw err;
