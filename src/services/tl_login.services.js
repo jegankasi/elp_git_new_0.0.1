@@ -76,7 +76,7 @@ const getUserRoleOfGroup = async (dbConnection, user) => {
         const group = [];
         for (const role of await service.getAll(dbConnection, "", { user_id: user.user_id }, { fields })) {
             let groups = await tl_group_service.getAll(dbConnection, "", { type_of_user_id: role[fields[0]], user_type }, ['parent_id']);
-            group.push({ [fields[0]]: role[fields[0]], [fields[1]]: role[fields[1]], group_id: groups.map(item => item.parent_id) });
+            group.push({ id: role[fields[0]], name: role[fields[1]], group_id: groups.map(item => item.parent_id) });
             groupList.push([groups.map(item => item.parent_id), ...groupList]);
         }
         return group;
