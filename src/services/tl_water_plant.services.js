@@ -38,6 +38,11 @@ const insert = async (dbConnection, userSession, body) => {
         await formValidation(formRequiredField.tl_water_plant("insert"), body);
         let response = await dbConnection.withTransaction(async tx => {
             await checkAndInsertProfile(tx, body.user_id, "WP", userSession.user_id);
+            let groupRecord = await tl_group_service.isExistGroupId(tx, userSession, { group_id: body.group_id });
+            if (!groupRecord) {
+                throw "group_id does not exist"
+            }
+
             let data = {
                 ...body,
                 action_flag: action_flag_A,
@@ -50,10 +55,7 @@ const insert = async (dbConnection, userSession, body) => {
             delete data.water_plant_id;
             delete data.water_plant_number;
             let waterPlant = await db_fn.insert_records(tx, schema, tl_water_plant, data);
-            if (userSession.activeRole === 'ADMIN') {
-                let adminRecord = await tl_group_service.getByUserType(tx, userSession, 'ADMIN');
-                await tl_group_service.insertTypeOfUser(tx, userSession, { group_id: adminRecord.parent_id, type_of_user_id: waterPlant.water_plant_id, user_type: "WP" })
-            }
+            await tl_group_service.insertTypeOfUser(tx, userSession, { group_id: body.group_id, type_of_user_id: waterPlant.water_plant_id, user_type: "WP" })
             return waterPlant;
         });
         return response;

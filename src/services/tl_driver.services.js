@@ -26,6 +26,10 @@ const insert = async (dbConnection, userSession, body) => {
             if (!profile) {
                 throw "error is occured on generating profile_id"
             }
+            let groupRecord = await tl_group_service.isExistGroupId(tx, userSession, { group_id: body.group_id });
+            if (!groupRecord) {
+                throw "group_id does not exist"
+            }
             let data = {
                 ...body,
                 profile_id: profile.id,
@@ -37,15 +41,11 @@ const insert = async (dbConnection, userSession, body) => {
                 dl_expires_on: toJSDate(body.dl_expires_on),
             }
             let driver = await db_fn.insert_records(tx, schema, tl_driver, data);
-            if (userSession.activeRole === 'ADMIN') {
-                let adminRecord = await tl_group_service.getByUserType(tx, userSession, 'ADMIN');
-                await tl_group_service.insertTypeOfUser(tx, userSession, { group_id: adminRecord.parent_id, type_of_user_id: driver.driver_id, user_type: "DR" })
-            }
+            await tl_group_service.insertTypeOfUser(tx, userSession, { group_id: data.group_id, type_of_user_id: driver.driver_id, user_type: "DR" });
             return driver;
         });
         return response;
     } catch (error) {
-        console.log("error---->", error);
         throw error;
     }
 }

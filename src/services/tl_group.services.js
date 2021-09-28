@@ -94,22 +94,22 @@ const insertGroup = async (dbConnection, userSession, body) => {
 const insert = async (dbConnection, userSession, body) => {
     let data;
     try {
-        if (!Array.isArray(body.groupMembers)) {
-            throw "it is not array of object";
-        }
+        // if (!Array.isArray(body.groupMembers)) {
+        //     throw "it is not array of object";
+        // }
 
         if (await isExistGroupId(dbConnection, { group_name: body.group_name })) {
             throw "group name is already exist";
         }
         data = await dbConnection.withTransaction(async tx => {
             let group = await insertGroup(tx, userSession, body);
-            body.groupMembers.forEach(async ob => {
-                await insertTypeOfUser(tx, userSession, {
-                    group_id: group.group_id,
-                    type_of_user_id: ob.id,
-                    user_type: ob.category
-                });
-            })
+            // body.groupMembers.forEach(async ob => {
+            //     await insertTypeOfUser(tx, userSession, {
+            //         group_id: group.group_id,
+            //         type_of_user_id: ob.id,
+            //         user_type: ob.category
+            //     });
+            // })
             return "success";
         });
     } catch (err) {
@@ -209,7 +209,6 @@ const isExistTypeOfUser = async (dbConnection, type_of_user_id, userSession, use
 const insertTypeOfUser = async (dbConnection, userSession, params) => {
     let { group_id, type_of_user_id, user_type } = params;
     try {
-        // await isExistGroupId(dbConnection, group_id);
         await isExistTypeOfUser(dbConnection, type_of_user_id, userSession, user_type);
 
         let data = {
@@ -354,3 +353,4 @@ module.exports.groupOfUser = groupOfUser;
 module.exports.getByUserType = getByUserType;
 module.exports.getTypeOfUserNumberByGroupId = getTypeOfUserNumberByGroupId;
 module.exports.getAllRoles = getAllRoles;
+module.exports.isExistGroupId = isExistGroupId;

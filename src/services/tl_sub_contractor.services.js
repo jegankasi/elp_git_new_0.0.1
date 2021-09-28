@@ -26,6 +26,10 @@ const insert = async (dbConnection, userSession, body) => {
             if (!profile) {
                 throw "error is occured on generating profile_id"
             }
+            let groupRecord = await tl_group_service.isExistGroupId(tx, userSession, { group_id: body.group_id });
+            if (!groupRecord) {
+                throw "group_id does not exist"
+            }
             let data = {
                 ...body,
                 action_flag: action_flag_A,
@@ -37,10 +41,7 @@ const insert = async (dbConnection, userSession, body) => {
             delete data.sub_contractor_number;
             delete data.sub_contractor_id;
             let subContractor = await db_fn.insert_records(tx, schema, tl_sub_contractor, data);
-            if (userSession.activeRole === 'ADMIN') {
-                let adminRecord = await tl_group_service.getByUserType(tx, userSession, 'ADMIN');
-                await tl_group_service.insertTypeOfUser(tx, userSession, { group_id: adminRecord.parent_id, type_of_user_id: subContractor.sub_contractor_id, user_type: "SCTR" })
-            }
+            await tl_group_service.insertTypeOfUser(tx, userSession, { group_id: body.group_id, type_of_user_id: subContractor.sub_contractor_id, user_type: "SCTR" });
             return subContractor;
         });
         return response;
