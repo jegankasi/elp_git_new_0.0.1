@@ -68,16 +68,16 @@ const getTransportQuotaionId = async (dbConnection, transaction_id) => await db_
 
 const insert = async (dbConnection, userSession, body, query, params) => {
     try {
-        if (!(userSession.activeRole == 'TPA' || userSession.activeRole == 'ADMIN')) {
+        if (!(userSession.activeRole == 'TPA' || userSession.activeRole == 'ADMIN' || userSession.activeRole == 'CTR')) {
             throw "forbidden access";
         }
         if (_.isEmpty(await getTransactionId(dbConnection, params.transaction_id))) {
             throw "transaction id is not valid";
         }
 
-        if (_.isEmpty(await getTransportQuotaionId(dbConnection, params.transaction_id))) {
-            throw "getTransportQuotaionId is not valid";
-        }
+        // if (_.isEmpty(await getTransportQuotaionId(dbConnection, params.transaction_id))) {
+        //     throw "getTransportQuotaionId is not valid";
+        // }
         await formValidation(formRequiredField.tl_transport_mapping("insert"), body);
         let data = {
             ...body
@@ -91,8 +91,11 @@ const insert = async (dbConnection, userSession, body, query, params) => {
 
 
 
-const update = async (dbConnection, body, query, params) => {
+const update = async (dbConnection, userSession, body, query, params) => {
     try {
+        if (!(userSession.activeRole == 'TPA' || userSession.activeRole == 'ADMIN' || userSession.activeRole == 'CTR')) {
+            throw "forbidden access";
+        }
         await formValidation(formRequiredField.tl_transport_mapping("update"), body);
         if (_.isEmpty(await getTransactionId(dbConnection, params.transaction_id))) {
             throw "transaction id is not valid";
@@ -101,7 +104,7 @@ const update = async (dbConnection, body, query, params) => {
             ...body,
             action_flag: action_flag_M,
             modified_on: currentDate(),
-            modified_by: getUserId(tokenId).userId,
+            modified_by: userSession.userId,
         }
 
         let criteria = {
