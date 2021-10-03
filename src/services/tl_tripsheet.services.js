@@ -1,5 +1,5 @@
 const db_fn = require('../configs/db.fn.config');
-const { schema, tl_transaction_order, tl_transport_mapping, tl_trip_sheet } = require('../configs/db.schema.table.config').doc_db_config;
+const { schema, tl_transaction_order, tl_transport_mapping, tl_trip_sheet, tl_transaction_order_quotation, tl_products_inventory } = require('../configs/db.schema.table.config').doc_db_config;
 const tl_transaction_order_quotation_service = require('../services/tl_transaction_order_quotation.services');
 const _ = require("underscore");
 
@@ -18,7 +18,10 @@ const compareProductsQuantity = (requestProduct, dbProduct) => {
 }
 
 const get = async (dbConnection, userSession, params) => {
-    return await db_fn.get_all_from_db(dbConnection, schema, tl_trip_sheet, { transaction_id: params.transaction_id });
+    const query = `select *  from ${schema}.${tl_transaction_order_quotation} as tlTsoQ  
+    inner join ${schema}.${tl_products_inventory} as tlPi on tlTsoQ.product_id = tlPi.product_id
+    where tlTsoQ.transaction_id = '${params.transaction_id}'`;
+    return await db_fn.run_query(dbConnection, query);
 }
 
 
