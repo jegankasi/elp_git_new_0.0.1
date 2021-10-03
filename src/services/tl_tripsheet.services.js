@@ -17,11 +17,15 @@ const compareProductsQuantity = (requestProduct, dbProduct) => {
     });
 }
 
-const get = async (dbConnection, userSession, params) => {
+const get_transaction_products = async (dbConnection, userSession, params) => {
     const query = `select *  from ${schema}.${tl_transaction_order_quotation} as tlTsoQ  
     inner join ${schema}.${tl_products_inventory} as tlPi on tlTsoQ.product_id = tlPi.product_id
     where tlTsoQ.transaction_id = '${params.transaction_id}'`;
     return await db_fn.run_query(dbConnection, query);
+}
+
+const getTripSheet = async (dbConnection, userSession, params) => {
+    return await db_fn.get_all_from_db(dbConnection, schema, tl_trip_sheet, { transaction_id: params.transaction_id });
 }
 
 
@@ -73,4 +77,5 @@ const insert = async (dbConnection, userSession, body, query, params) => {
 }
 
 module.exports.insert = insert;
-module.exports.get = get;
+module.exports.get_transaction_products = get_transaction_products;
+module.exports.getTripSheet = getTripSheet;
