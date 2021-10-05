@@ -38,7 +38,7 @@ const getTransactionOrder = async (dbConnection, userSession, query) => {
         if (!(userSession.activeRole == 'CTR' || userSession.activeRole == 'TPA' || userSession.activeRole == 'WP' || userSession.activeRole == 'IND' || userSession.activeRole == 'ADMIN')) {
             throw "forbidden access";
         }
-        if (userSession.activeRole == 'ADMIN') {
+        if (userSession.activeRole == 'ADMIN' || userSession.activeRole == 'CTR') {
             if (_.isEmpty(query) || query.group_id == '') {
                 throw 'group_id should be sent in query param';
             }
