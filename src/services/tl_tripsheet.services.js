@@ -28,11 +28,9 @@ const getTripSheet = async (dbConnection, userSession, params) => {
     return await db_fn.get_all_from_db(dbConnection, schema, tl_trip_sheet, { transaction_id: params.transaction_id });
 }
 
-
-
 const insert = async (dbConnection, userSession, body, query, params) => {
     try {
-        if (!(userSession.activeRole == 'TPA' || userSession.activeRole == 'ADMIN')) {
+        if (!(userSession.activeRole == 'TPA' || userSession.activeRole == 'CTR' || userSession.activeRole == 'ADMIN')) {
             throw "forbidden access";
         }
         if (_.isEmpty(await getTransactionId(dbConnection, params.transaction_id))) {
@@ -45,31 +43,19 @@ const insert = async (dbConnection, userSession, body, query, params) => {
         if (_.isEmpty(await getTransactionMappingId(dbConnection, params.transaction_id))) {
             throw "transaction_mapping_id is not valid";
         }
-
-        let transactionMappingId = await getTransactionMappingId(dbConnection, params.transaction_id);
-        let tripSheetId = await getTripSheetId(dbConnection, params.transaction_id);
-
-        for (const item of body.deliver_product_to_industry) {
-            if (item.quantity == 0) {
-                throw `quantity should not be 0 for ${item.product_id}`;
-            }
-            if (!transactionMappingId || _.isEmpty(transactionMappingId.filter(data => data.transport_mapping_id == item.transport_mapping_id))) {
-                throw `${item.transport_mapping_id} is not valid`;
-            }
-            let tripItem = tripSheetId.filter(data => data.transaction_id == params.transaction_id && data.product_id == item.product_id && data.transport_mapping_id == item.transport_mapping_id);
-            if (!_.isEmpty(tripItem)) {
-                if (!item.tripsheet_id) {
-                    throw `${item.product_id}| please add attribute tripsheet_id`;
+        await dbConnection.withTransaction(async tx => {
+            let transactionMappingId = await getTransactionMappingId(tx, params.transaction_id);
+            await db_fn.delete_records(tx, schema, tl_trip_sheet, { transaction_id: params.transaction_id });
+            for (const item of body.deliver_product_to_industry) {
+                if (item.quantity == 0) {
+                    throw `quantity should not be 0 for ${item.product_id}`;
                 }
-                let tripId = tripItem.filter(data => data.tripsheet_id == item.tripsheet_id);
-                if (_.isEmpty(tripId)) {
-                    throw `${item.product_id}| please add respective tripsheet_id`;
+                if (!transactionMappingId || _.isEmpty(transactionMappingId.filter(data => data.transport_mapping_id == item.transport_mapping_id))) {
+                    throw `transport_mapping_id ${item.transport_mapping_id} is not valid`;
                 }
-                await db_fn.update_records(dbConnection, schema, tl_trip_sheet, { tripsheet_id: item.tripsheet_id, transaction_id: params.transaction_id }, item);
-            } else {
-                await db_fn.insert_records(dbConnection, schema, tl_trip_sheet, { ...item, transaction_id: params.transaction_id });
+                await db_fn.insert_records(tx, schema, tl_trip_sheet, { ...item, transaction_id: params.transaction_id });
             }
-        }
+        });
     } catch (err) {
         throw err;
     }
