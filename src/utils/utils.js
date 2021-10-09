@@ -104,12 +104,12 @@ const isActiveRoleAllowed = (userSession, group_id, active_role_id) => {
     else if (userSession.activeRole == 'IND') {
         id = 'industry_id'
     }
-
-    let group = Array.isArray(userSession[userSession.activeRole]) && userSession[userSession.activeRole].filter(data => data[id] == active_role_id).map(ob => ob[id] == active_role_id && ob.group_id.find((itms) => itms));
-    if (group[0] != group_id) {
-        throw "group id does not match";
+    let groups = userSession[userSession.activeRole].map(i => i.id == active_role_id ? i.group_id : []);
+    if (Array.isArray(groups) && groups.length >= 0 && groups[0].includes(parseInt(3))) {
+        return true;
     }
-    return true;
+    throw "group id does not match";
+
 }
 
 module.exports = {
