@@ -27,7 +27,7 @@ const insert = async (dbConnection, userSession, body) => {
             if (!profile) {
                 throw "error is occured on generating profile_id"
             }
-            let groupRecord = await tl_group_service.isExistGroupId(tx, userSession, { group_id: body.group_id });
+            let groupRecord = await tl_group_service.isExistGroupId(tx, { group_id: body.group_id });
             if (!groupRecord) {
                 throw "group_id does not exist"
             }

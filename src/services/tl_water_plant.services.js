@@ -38,7 +38,7 @@ const insert = async (dbConnection, userSession, body) => {
         await formValidation(formRequiredField.tl_water_plant("insert"), body);
         let response = await dbConnection.withTransaction(async tx => {
             await checkAndInsertProfile(tx, body.user_id, "WP", userSession.user_id);
-            let groupRecord = await tl_group_service.isExistGroupId(tx, userSession, { group_id: body.group_id });
+            let groupRecord = await tl_group_service.isExistGroupId(tx, { group_id: body.group_id });
             if (!groupRecord) {
                 throw "group_id does not exist"
             }
