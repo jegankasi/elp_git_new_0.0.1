@@ -120,9 +120,12 @@ const insert = async (dbConnection, userSession, body) => {
 
 const isExistGroupId = async (dbConnection, criteria) => {
     try {
+
         let isExist = await db_fn.get_one_from_db(dbConnection, schema, tl_group, criteria);
+
         return isExist;
     } catch (error) {
+
         throw error;
     }
 }

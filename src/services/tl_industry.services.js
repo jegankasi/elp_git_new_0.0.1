@@ -25,14 +25,16 @@ const insert = async (dbConnection, userSession, body) => {
         await formValidation(formRequiredField.tl_industry("insert"), body);
         let response = await dbConnection.withTransaction(async tx => {
             let profile = await checkAndInsertProfile(tx, body.user_id, "IND");
-
             if (!profile) {
                 throw "error is occured on generating profile_id"
             }
-            let groupRecord = await tl_group_service.isExistGroupId(tx, userSession, { group_id: body.group_id });
+
+            let groupRecord = await tl_group_service.isExistGroupId(tx, { group_id: body.group_id });
+
             if (!groupRecord) {
                 throw "group_id does not exist"
             }
+
             let data = {
                 ...body,
                 action_flag: action_flag_A,
@@ -42,7 +44,9 @@ const insert = async (dbConnection, userSession, body) => {
                 created_by: userSession.user_id,
                 established_on: toJSDate(body.established_on),
             }
+
             delete data.industry_id;
+
             let industry = await db_fn.insert_records(tx, schema, tl_industry, data);
             await tl_group_service.insertTypeOfUser(tx, userSession, { group_id: body.group_id, type_of_user_id: industry.industry_id, user_type: "IND" })
             return industry;

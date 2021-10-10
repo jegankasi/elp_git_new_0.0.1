@@ -26,7 +26,9 @@ const checkAndInsertProfile = async (dbConnection, userId, user_role, user_sessi
                         modified_by: user_session_id,
                         created_by: user_session_id
                     }
+
                     profile = await tl_profile.insert(dbConnection, body);
+
                 }
             } else {
                 throw `user type ${user_type}  does not exist`;
