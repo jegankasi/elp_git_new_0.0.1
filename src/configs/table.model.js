@@ -276,7 +276,7 @@ const tl_tables = [
 
 const tl_water_plant = (method) => [
     { "plant_name": [field.required, field.varchar, 1, 50] },
-    { "group_id": [field.required, field.varchar, 1, 50] },
+    { "group_id": [field.required, field.num, 1, 50] },
     { "established_on": [field.noValidate, field.timestamp] },
     { "plant_type": [field.required, field.varchar, 1, 50] },
     { "plant_contact_no": [field.required, field.varchar, 1, 20] },
