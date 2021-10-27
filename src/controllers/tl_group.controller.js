@@ -53,18 +53,18 @@ router.post('/group_id/:group_id/type_of_user_number/:type_of_user_number/user_t
 });
 
 
-router.put('/id/:id', async (req, res) => {
+router.put('/group_id/:group_id', async (req, res) => {
     try {
-        const data = await tl_group.update(req.app.get("db"), req.body);
+        const data = await tl_group.update(req.app.get("db"), req.user_session, req.body, req.params.group_id);
         return reposne_utils.send_response(req, res, 200, data);
     } catch (err) {
         return res.status(403).send(err);
     }
 });
 
-router.delete('/id/:id', async (req, res) => {
+router.delete('/group_id/:group_id', async (req, res) => {
     try {
-        const data = await tl_group.deleteRecord(req.app.get("db"), req.params.id);
+        const data = await tl_group.deleteRecord(req.app.get("db"), req.params.group_id);
         return reposne_utils.send_response(req, res, 200, data);
     } catch (err) {
         return res.status(403).send(err);

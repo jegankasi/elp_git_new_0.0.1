@@ -588,7 +588,7 @@ const tl_util = (method) => [
 ];
 
 const tl_group = (method) => [
-    // { "id": [method === 'update' ? field.required : field.noRequired, field.num] },
+    { "group_id": [method === 'update' ? field.required : field.noRequired, field.num] },
     { "group_name": [field.required, field.varchar, 1, 20] },
     { "description": [field.noValidate, field.varchar, 1, 100] },
     { "action_flag": [field.noValidate, field.varchar, 1, 1] },

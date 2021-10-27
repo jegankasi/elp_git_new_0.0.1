@@ -232,19 +232,19 @@ const insertTypeOfUser = async (dbConnection, userSession, params) => {
     }
 }
 
-const update = async (dbConnection, body, tokenId) => {
+const update = async (dbConnection, userSession, body, group_id) => {
     try {
-        await formValidation(formRequiredField.tl_group("update"), body);
+        await formValidation(formRequiredField.tl_group("update"), { ...body, group_id: parseInt(group_id) });
         let data = {
             ...body,
             action_flag: action_flag_M,
             modified_on: currentDate(),
-            modified_by: getUserId(tokenId).userId
+            modified_by: userSession.user_id
         }
 
 
         let criteria = {
-            id: body.id
+            group_id
         }
         return await db_fn.update_records(dbConnection, schema, tl_group, criteria, data);
     } catch (error) {
@@ -252,10 +252,10 @@ const update = async (dbConnection, body, tokenId) => {
     }
 }
 
-const deleteRecord = async (dbConnection, id) => {
+const deleteRecord = async (dbConnection, group_id) => {
     try {
         let criteria = {
-            id: id
+            group_id
         }
         await db_fn.delete_records(dbConnection, schema, tl_group, criteria);
         return "deleted";
