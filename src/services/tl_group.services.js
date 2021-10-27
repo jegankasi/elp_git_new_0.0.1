@@ -110,7 +110,7 @@ const insert = async (dbConnection, userSession, body) => {
             //         user_type: ob.category
             //     });
             // })
-            return "success";
+            return group;
         });
     } catch (err) {
         throw err;
