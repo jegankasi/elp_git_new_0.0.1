@@ -49,23 +49,14 @@ const getProfileAuthAccess = async (dbConnection, profile_id) => {
 
 // { fields: ['type', 'parent_id', 'user_role_id'] }
 const userProfile = async (dbConnection, user_id, roles) => {
-    const user_profile_List = [];
-    let user_profiles = await tl_profile_service.getAll(dbConnection, { user_role_id: user_id, type: "U" });
-    for (const rec of user_profiles) {
-        let profile_rec = await tl_profile_service.get(dbConnection, { profile_id: rec.parent_id });
-        if (profile_rec) {
-            let userType = await tl_user_roles_service.get(dbConnection, { user_role_id: profile_rec.user_role_id });
-            // const user_profile = {};
-            if (userType) {
-                // user_profile.user_role_id = profile_rec.user_role_id;
-                //user_profile.user_role = userType.user_role;
-                // user_profile.profile_id = rec.profile_id;
-                roles.push(userType.user_role);
-                //user_profile_List.push(user_profile);
-            }
-        }
-    }
-    return user_profile_List;
+    const query = `select
+    tur.user_role as user_role
+    from ${schema}.tl_profile as tlP 
+    join  ${schema}.tl_profile as tp  on ( tlp.parent_id = tp.profile_id)
+    left join ${schema}.tl_user_roles as tur on (  tp.user_role_id = tur.user_role_id and tp.type = 'G')
+    where tlp.user_role_id = ${user_id}`;
+    const res = await db_fn.run_query(dbConnection, query);
+    roles.push(...res.map(data => data.user_role));
 }
 
 const getUserRoleOfGroup = async (dbConnection, user) => {
@@ -79,16 +70,24 @@ const getUserRoleOfGroup = async (dbConnection, user) => {
         }
         return group;
     }
-    user.WP = await userRoles(tl_water_plant_service, ['water_plant_id', 'plant_name'], 'WP');
-    user.IND = await userRoles(tl_industry_service, ["industry_id", 'industry_name'], "IND");
-    user.CTR = await userRoles(tl_contractor_service, ["contractor_id", "agency_name"], "CTR");
-    user.DB = await userRoles(tl_delivery_boy_service, ["delivery_boy_id", "deliveryboy_name"], "DB");
-    user.DR = await userRoles(tl_driver_service, ["driver_id", "driver_name"], "DR");
-    user.SCTR = await userRoles(tl_sub_contractor_service, ["sub_contractor_id", "agency_name"], "SCTR");
-    user.TPA = await userRoles(tl_transport_agent_service, ["transport_agent_id", "agency_name"], "TPA");
-    user.VEH = await userRoles(tl_vehicle_service, ["vehicle_id", 'vehicle_reg_no'], "VEH");
+    let role = user.roles;
 
-
+    if (role.includes('WP'))
+        user.WP = await userRoles(tl_water_plant_service, ['water_plant_id', 'plant_name'], 'WP');
+    if (role.includes('IND'))
+        user.IND = await userRoles(tl_industry_service, ["industry_id", 'industry_name'], "IND");
+    if (role.includes('CTR'))
+        user.CTR = await userRoles(tl_contractor_service, ["contractor_id", "agency_name"], "CTR");
+    if (role.includes('DB'))
+        user.DB = await userRoles(tl_delivery_boy_service, ["delivery_boy_id", "deliveryboy_name"], "DB");
+    if (role.includes('DR'))
+        user.DR = await userRoles(tl_driver_service, ["driver_id", "driver_name"], "DR");
+    if (role.includes('SCTR'))
+        user.SCTR = await userRoles(tl_sub_contractor_service, ["sub_contractor_id", "agency_name"], "SCTR");
+    if (role.includes('TPA'))
+        user.TPA = await userRoles(tl_transport_agent_service, ["transport_agent_id", "agency_name"], "TPA");
+    if (role.includes('VEH'))
+        user.VEH = await userRoles(tl_vehicle_service, ["vehicle_id", 'vehicle_reg_no'], "VEH");
     user.groupList = Array.isArray(groupList) && groupList.length >= 1 ? await tl_group_service.runQuery(dbConnection, null, `select group_id, group_name from ${schema}.${tl_group} where group_id in (${groupList.toString()})`) : [];
     return user;
 }
