@@ -282,7 +282,7 @@ const tl_water_plant = (method) => [
     { "plant_contact_no": [field.required, field.num, 1, 20] },
     { "plant_contact_email": [field.required, field.varchar, 1, 50] },
     { "plant_contact_address": [field.required, field.varchar, 1, 500] },
-    { "plant_pincode": [field.required, field.varchar, 1, 6] },
+    { "plant_pincode": [field.required, field.num, 1, 6] },
     { "country_code": [field.required, field.varchar, 1, 3] },
     { "plant_licence_no": [field.required, field.varchar, 1, 50] },
     { "plant_isi_number": [field.required, field.varchar, 1, 50] },
